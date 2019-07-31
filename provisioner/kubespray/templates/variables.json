@@ -1,0 +1,6 @@
+{
+	"kube_network_plugin": "weave",
+	"helm_enabled" : true,
+	"kube_service_addresses" : "${kube_service_addresses}",
+	"kube_pods_subnet" : "${kube_pods_subnet}"
+}
