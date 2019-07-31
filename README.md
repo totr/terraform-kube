@@ -2,14 +2,15 @@
 
 Kubernetes cluster provisioning using Terraform and Kubespray.
 
-- [Terraform Kube](#Terraform-Kube)
-	- [Prerequisites](#Prerequisites)
-	- [Setup](#Setup)
-	- [Install](#Install)
-		- [Provision servers](#Provision-servers)
-		- [Provision Kubernetes](#Provision-Kubernetes)
-			- [Download Kuberspray](#Download-Kuberspray)
-			- [Run ansible-playbook](#Run-ansible-playbook)
+- [Terraform Kube](#terraform-kube)
+	- [Prerequisites](#prerequisites)
+	- [Setup](#setup)
+	- [Install](#install)
+		- [Provision servers](#provision-servers)
+		- [Provision Kubernetes](#provision-kubernetes)
+			- [Download Kuberspray](#download-kuberspray)
+			- [Run ansible-playbook](#run-ansible-playbook)
+	- [Roadmap](#roadmap)
 
 ## Prerequisites
 * Terraform version >= 0.12.5
@@ -24,7 +25,7 @@ Setup Terraform environment (sudo settings is only necessary on MacOS, due to [T
 sudo terraform init 
 ```
 
-Create a local file with the name *development.tfvars* and fill in the following parameters:
+Create a local file with the name *development.tfvars* in *environments* folder and fill in the following parameters:
 
 ```
 provider_token=
@@ -46,7 +47,7 @@ ssh_private_key_path =
 ### Provision servers
 
 ```bash
-sudo terraform apply -var-file="development.tfvars"  -auto-approve
+sudo terraform apply -var-file="environments/development.tfvars"  -auto-approve
 ```
 
 ### Provision Kubernetes
@@ -63,10 +64,18 @@ git checkout <RELEASE_TAG>
 
 #### Run ansible-playbook
 
-Set *ANSIBLE_INVALID_TASK_ATTRIBUTE_FAILED* to *false* because of Ansible 2.8.x ( [see]( https://github.com/kubernetes-sigs/kubespray/issues/3985), [and]( https://github.com/ansible/ansible/issues/56072))
+Set *ANSIBLE_INVALID_TASK_ATTRIBUTE_FAILED* to *false* because of Ansible 2.8.x ( [see kubespray issue]( https://github.com/kubernetes-sigs/kubespray/issues/3985), and [ansible issue]( https://github.com/ansible/ansible/issues/56072))
 ```bash
 export ANSIBLE_INVALID_TASK_ATTRIBUTE_FAILED=False
 ```
 ```bash
-ansible-playbook -i ../ansible-hosts.ini cluster.yml
+# run inside kubespray directory
+ansible-playbook -i ../inventories/default/hosts.ini cluster.yml --extra-vars "@../inventories/default/variables.json"
 ```
+
+## Roadmap
+* Provisioning pipeline in https://concourse-ci.org 
+* Floating IP - https://www.terraform.io/docs/providers/hcloud/r/floating_ip.html
+* DNS Management
+* SSL Cert Management
+* Metallb Deployment

@@ -5,8 +5,12 @@
 *.tfstate
 *.tfstate.*
 
-# generated ansible hosts file
-ansible-hosts.ini
+# generated kubespray configuration
+inventories/**/hosts.ini
+inventories/**/variables.json
+
+# Concourse ci
+concourse-ci.yml
 
 # Kubespray
 kubespray

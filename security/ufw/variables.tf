@@ -1,14 +1,26 @@
 variable "server_count" {
-  type = "string"
+  type = string
 }
-variable "server_connections" {
-  type = "list"
+variable "hosts" {
+  type = list(string)
 }
 
 variable "ssh_private_key_path" {
-  type = "string"
+  type = string
 }
 
 variable "private_interface" {
-  type = "string"
+  type = string
+}
+
+variable "vpn_interface" {
+  type = string
+}
+
+variable "vpn_port" {
+  type = string
+}
+
+variable "kube_overlay_interface" {
+  type = string
 }

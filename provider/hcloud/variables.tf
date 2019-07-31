@@ -1,34 +1,49 @@
 variable "provider_token" {
-  type = "string"
+  type = string
 }
 
 variable "provider_ssh_key_names" {
-  type = "list"
+  type = list(string)
 }
 
 variable "ssh_private_key_path" {
-  type = "string"
+  type = string
 }
 
 variable "provider_server_image" {
-  type = "string"
-	default = "ubuntu-18.04"
+  type    = string
+  default = "ubuntu-18.04"
 }
 
 variable "provider_server_type" {
-  type = "string"
-	default = "cx21"
+  type    = string
+  default = "cx21"
 }
 
 variable "provider_hostname_format" {
-	type = "string"
+  type    = string
   default = "kube-%s-%s"
 }
 
-variable "k8s_master_nodes_count" {
-	type = "string"
+variable "provider_private_network_ip_range" {
+  type    = string
+  default = "10.0.0.0/8"
 }
 
-variable "k8s_worker_nodes_count" {
-	type = "string"
+variable "provider_private_network_subnet_ip_range" {
+  type    = string
+  default = "10.0.0.0/24"
+}
+
+variable "provider_network_zone" {
+  type    = string
+  default = "eu-central"
+}
+
+variable "master_nodes_count" {
+  type = string
+}
+
+variable "worker_nodes_count" {
+  type = string
 }
