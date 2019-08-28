@@ -2,8 +2,8 @@ resource_types:
 - name: terraform
   type: docker-image
   source:
-    repository: ljfranklin/terraform-resource
-    tag: 0.12.5
+    repository: totr/terraform-kube-builder
+    tag: latest
 
 resources:
 - name: terraform-state
@@ -14,23 +14,14 @@ resources:
     backend_type: s3
     backend_config:
 # see https://wasabi-support.zendesk.com/hc/en-us/articles/360003362071-How-I-do-use-Terraform-with-Wasabi-
-      endpoint: "https://s3.wasabisys.com"
-      skip_requesting_account_id: true
+      endpoint: "https://s3.eu-central-1.wasabisys.com"
       skip_credentials_validation: true
-      skip_get_ec2_platforms: true
       skip_metadata_api_check: true
-      bucket: terraform-state-test
+      bucket: terraform-state
       key: terraform.tfstate
-# TODO eu-central-1 not working
-      region: us-east-1 
-# see https://wasabi.com/wp-content/themes/wasabi/docs/Getting_Started/topics/Assigning_an_Access_Key.htm
+      region: eu-central-1
       access_key: ((terraform-backend-access-key))
       secret_key: ((terraform-backend-secret-key))
-    vars:
-      tag_name: concourse
-    env:
-#      AWS_REGION: us-east-1
-#      AWS_DEFAULT_REGION: eu-central-1
 
 - name: terraform-kube
   type: git
@@ -38,6 +29,7 @@ resources:
   source:
     uri: https://github.com/totr/terraform-kube
     branch: master
+    git_crypt_key: ((git-crypt-key))
 
 - name: kubespray
   type: git
@@ -54,8 +46,7 @@ jobs:
     - put: terraform-state
       params:
         env_name: ((env-name))
-        var_files:
-        - environments/((env-name)).tfvars
+        var_files: [terraform-kube/environments/((env-name)).tfvars]
         terraform_source: terraform-kube
 
 - name: kubespray-run
