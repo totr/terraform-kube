@@ -2,14 +2,6 @@ variable "provider_token" {
   type = string
 }
 
-variable "provider_ssh_key_names" {
-  type = list(string)
-}
-
-variable "ssh_private_key_path" {
-  type = string
-}
-
 variable "provider_server_image" {
   type    = string
   default = "ubuntu-18.04"

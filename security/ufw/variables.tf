@@ -5,8 +5,8 @@ variable "hosts" {
   type = list(string)
 }
 
-variable "ssh_private_key_path" {
-  type = string
+variable "ssh_private_key" {
+	type = string
 }
 
 variable "private_interface" {

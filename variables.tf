@@ -2,14 +2,6 @@ variable "provider_token" {
   type = string
 }
 
-variable "provider_ssh_key_names" {
-  type = list(string)
-}
-
-variable "ssh_private_key_path" {
-  type = string
-}
-
 variable "master_nodes_count" {
   type    = string
   default = "1"

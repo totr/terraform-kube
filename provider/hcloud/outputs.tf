@@ -14,6 +14,10 @@ output "private_network_interface" {
   value = "ens10"
 }
 
+output "ssh_private_key" {
+  value = tls_private_key.access_key.private_key_pem
+}
+
 output "master_nodes" {
   value = flatten([
     for i in hcloud_server.host[*] : {

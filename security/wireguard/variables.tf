@@ -10,11 +10,13 @@ variable "hostnames" {
   type = list(string)
 }
 
+variable "ssh_private_key" {
+	type = string
+}
+
+
 variable "private_ips" {
   type = list
-}
-variable "ssh_private_key_path" {
-  type = string
 }
 
 variable "vpn_interface" {

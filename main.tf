@@ -14,33 +14,35 @@ provider "template" {
   version = "~> 2.1"
 }
 
+provider "tls" {
+  version = "~> 2.0"
+}
+
 module "provider" {
   source = "./provider/hcloud"
 
-  provider_token         = var.provider_token
-  provider_ssh_key_names = var.provider_ssh_key_names
-  ssh_private_key_path   = var.ssh_private_key_path
-  master_nodes_count     = var.master_nodes_count
-  worker_nodes_count     = var.worker_nodes_count
+  provider_token     = var.provider_token
+  master_nodes_count = var.master_nodes_count
+  worker_nodes_count = var.worker_nodes_count
 }
 
 module "vpn" {
   source = "./security/wireguard"
 
-  ssh_private_key_path = var.ssh_private_key_path
-  server_count         = var.master_nodes_count + var.worker_nodes_count
-  hosts                = module.provider.public_ips
-  private_ips          = module.provider.private_ips
-  hostnames            = module.provider.hostnames
-  overlay_cidr         = var.kube_service_addresses
+  server_count    = var.master_nodes_count + var.worker_nodes_count
+  hosts           = module.provider.public_ips
+  ssh_private_key = module.provider.ssh_private_key
+  private_ips     = module.provider.private_ips
+  hostnames       = module.provider.hostnames
+  overlay_cidr    = var.kube_service_addresses
 }
 
 module "firewall" {
   source = "./security/ufw"
 
-  ssh_private_key_path   = var.ssh_private_key_path
   server_count           = var.master_nodes_count + var.worker_nodes_count
   hosts                  = module.provider.public_ips
+  ssh_private_key        = module.provider.ssh_private_key
   private_interface      = module.provider.private_network_interface
   vpn_interface          = module.vpn.vpn_interface
   vpn_port               = module.vpn.vpn_port

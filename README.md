@@ -5,11 +5,13 @@ Kubernetes cluster provisioning using Terraform and Kubespray.
 - [Terraform Kube](#terraform-kube)
 	- [Prerequisites](#prerequisites)
 	- [Setup](#setup)
+	- [Wasabi](#wasabi)
 	- [Install](#install)
 		- [Provision servers](#provision-servers)
 		- [Provision Kubernetes](#provision-kubernetes)
 			- [Download Kuberspray](#download-kuberspray)
 			- [Run ansible-playbook](#run-ansible-playbook)
+	- [CI](#ci)
 	- [Roadmap](#roadmap)
 
 ## Prerequisites
@@ -17,6 +19,7 @@ Kubernetes cluster provisioning using Terraform and Kubespray.
 * Ansible version >= 2.8.2
 * [Kubespray requirements](https://github.com/kubernetes-sigs/kubespray#requirements)
 * HetznerCloud Servers (3x CX21, [see](https://www.hetzner.com/cloud#))
+* [Git-crypt](https://github.com/AGWA/git-crypt)
 
 ## Setup
 
@@ -29,25 +32,26 @@ Create a local file with the name *development.tfvars* in *environments* folder 
 
 ```
 provider_token=
-provider_ssh_key_names = [
-	
-]
-ssh_private_key_path = 
 ```
 
 
 | Name  | Description  | 
 |---|---|
 | provider_token  | Cloud access token (https://console.hetzner.cloud/projects/<PROJECT_ID>/access/tokens)  | 
-| provider_ssh_key_names  | Access SSH keys (https://console.hetzner.cloud/projects/<PROJECT_ID>/access/sshkeys)  | 
-| ssh_private_key_path  | Local path to private ssh key to connect to created servers (must be one of the stored in provider_ssh_key_names)  | 
+
+## Wasabi
+
+ https://wasabi.com/wp-content/themes/wasabi/docs/Getting_Started/topics/Assigning_an_Access_Key.htm
+https://wasabi.com/wp-content/themes/wasabi/docs/User_Guide/topics/Creating_a_Bucket.htm
+credetials.yaml
+
 
 ## Install
 
 ### Provision servers
 
 ```bash
-sudo terraform apply -var-file="environments/development.tfvars"  -auto-approve
+sudo terraform apply -var-file="environments/hc-dev.tfvars"  -auto-approve
 ```
 
 ### Provision Kubernetes
@@ -73,8 +77,11 @@ export ANSIBLE_INVALID_TASK_ATTRIBUTE_FAILED=False
 ansible-playbook -i ../inventories/default/hosts.ini cluster.yml --extra-vars "@../inventories/default/variables.json"
 ```
 
+## CI
+
+git-crypt export-key -- - | base64
+
 ## Roadmap
-* Provisioning pipeline in https://concourse-ci.org 
 * Floating IP - https://www.terraform.io/docs/providers/hcloud/r/floating_ip.html
 * DNS Management
 * SSL Cert Management

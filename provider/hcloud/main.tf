@@ -3,17 +3,27 @@ provider "hcloud" {
   token   = var.provider_token
 }
 
+resource "tls_private_key" "access_key" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "hcloud_ssh_key" "terraform-key" {
+  name = "terraform-key"
+  public_key = tls_private_key.access_key.public_key_openssh
+}
+
 resource "hcloud_server" "host" {
   name        = format(var.provider_hostname_format, count.index < var.master_nodes_count ? "master" : "worker", count.index + 1)
   image       = var.provider_server_image
   server_type = var.provider_server_type
   count       = var.master_nodes_count + var.worker_nodes_count
-  ssh_keys    = var.provider_ssh_key_names
+  ssh_keys    = [hcloud_ssh_key.terraform-key.name]
   labels      = map("server_type", count.index < var.master_nodes_count ? "master" : "worker")
 
   connection {
     host        = self.ipv4_address
-    private_key = file(var.ssh_private_key_path)
+    private_key = tls_private_key.access_key.private_key_pem
   }
 
   provisioner "remote-exec" {
