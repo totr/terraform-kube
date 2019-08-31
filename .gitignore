@@ -5,20 +5,12 @@
 *.tfstate
 *.tfstate.*
 
-# generated kubespray configuration
-inventories/**/hosts.ini
-inventories/**/variables.json
-
 # Concourse ci
 concourse-ci.yml
 credentials.yaml
 
-# Kubespray
-kubespray
-
 # Crash log files
 crash.log
-
 
 # Ignore override files as they are usually used to override resources locally and so
 # are not checked in
