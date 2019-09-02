@@ -30,7 +30,7 @@ resource "hcloud_server" "host" {
     inline = [
       "while fuser /var/lib/apt/lists/lock >/dev/null 2>&1; do sleep 1; done",
       "apt-get update",
-      "apt-get install -yq ufw python-minimal python-setuptools"
+      "apt-get install -yq ufw python-minimal python-setuptools python-netaddr"
     ]
   }
 }
