@@ -22,7 +22,6 @@ variable "kube_pods_subnet" {
   default = "172.16.0.0/16"
 }
 
-
 variable "kube_overlay_interface" {
   type    = string
   default = "kube-ipvs0"

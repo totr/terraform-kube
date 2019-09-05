@@ -5,8 +5,12 @@ locals {
     worker_nodes = var.worker_nodes
   })
 
-  variables = templatefile("${path.module}/templates/variables.json", {
+  cluster_vars = templatefile("${path.module}/templates/k8s-cluster.yml", {
     kube_service_addresses = var.kube_service_addresses
     kube_pods_subnet       = var.kube_pods_subnet
+  })
+
+	addons_vars = templatefile("${path.module}/templates/addons.yml", {
+
   })
 }
