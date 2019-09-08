@@ -2,6 +2,14 @@ output "ssh_private_key" {
   value = module.provider.ssh_private_key
 }
 
+variable "master_nodes" {
+  value = module.provider.master_nodes
+}
+
+variable "worker_nodes" {
+  value = module.provider.worker_nodes
+}
+
 output "kubespray_inventory" {
   value = module.provisioner.inventory
 }
