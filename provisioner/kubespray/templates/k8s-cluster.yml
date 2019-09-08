@@ -1,4 +1,3 @@
 kube_network_plugin: flannel
-kubeconfig_localhost: true
 kube_service_addresses: ${kube_service_addresses}
 kube_pods_subnet: ${kube_pods_subnet}
