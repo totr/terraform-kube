@@ -2,6 +2,18 @@ variable "provider_token" {
   type = string
 }
 
+variable "domain" {
+  type = string
+}
+
+variable "email" {
+  type = string
+}
+
+variable "dns_api_token" {
+  type = string
+}
+
 variable "master_nodes_count" {
   type    = string
   default = "1"

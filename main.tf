@@ -49,6 +49,15 @@ module "firewall" {
   kube_overlay_interface = var.kube_overlay_interface
 }
 
+module "dns" {
+  source = "./dns/cloudflare"
+
+  public_ips = module.provider.public_ips
+  domain     = var.domain
+  email      = var.email
+  api_token  = var.dns_api_token
+}
+
 module "provisioner" {
   source = "./provisioner/kubespray"
 
