@@ -1,37 +1,35 @@
 # Terraform Kube
 
-Kubernetes cluster provisioning using Terraform and Kubespray.
+**Kubernetes cluster provisioning using Terraform and Kubespray in Concourse CI environment.**
+
+![alt](docs/pipeline.png)
 
 - [Terraform Kube](#terraform-kube)
 	- [Prerequisites](#prerequisites)
-	- [Setup](#setup)
-	- [Wasabi](#wasabi)
-	- [Install](#install)
-		- [Provision servers](#provision-servers)
-		- [Provision Kubernetes](#provision-kubernetes)
-			- [Download Kuberspray](#download-kuberspray)
-			- [Run ansible-playbook](#run-ansible-playbook)
-	- [CI](#ci)
+	- [Getting started](#getting-started)
+		- [Hetzner Cloud](#hetzner-cloud)
+		- [Wasabi S3 Storage for Terraform state](#wasabi-s3-storage-for-terraform-state)
+		- [Cloudflare](#cloudflare)
+		- [Concourse CI](#concourse-ci)
 	- [Roadmap](#roadmap)
 
 ## Prerequisites
-* Terraform version >= 0.12.5
-* Ansible version >= 2.8.2
-* [Kubespray requirements](https://github.com/kubernetes-sigs/kubespray#requirements)
+* Docker Compose >= 1.22.0
 * HetznerCloud Servers (3x CX21, [see](https://www.hetzner.com/cloud#))
+* Wasabi S3 Storage (https://wasabi.com)
+* Cloudflare free plan
 * [Git-crypt](https://github.com/AGWA/git-crypt)
 
-## Setup
+## Getting started
 
-Setup Terraform environment (sudo settings is only necessary on MacOS, due to [TLS handshake timeout](https://github.com/hashicorp/terraform/issues/15817))
-```bash
-sudo terraform init 
+### Hetzner Cloud
+
+Create a project in Hetzner Cloud environment. 
+
+Create a local file with the name <PROJECT_ID>.tfvars in *environments* folder and fill in the following parameter:
+
 ```
-
-Create a local file with the name *development.tfvars* in *environments* folder and fill in the following parameters:
-
-```
-provider_token=
+provider_token =
 ```
 
 
@@ -39,50 +37,56 @@ provider_token=
 |---|---|
 | provider_token  | Cloud access token (https://console.hetzner.cloud/projects/<PROJECT_ID>/access/tokens)  | 
 
-## Wasabi
+### Wasabi S3 Storage for Terraform state
 
- https://wasabi.com/wp-content/themes/wasabi/docs/Getting_Started/topics/Assigning_an_Access_Key.htm
-https://wasabi.com/wp-content/themes/wasabi/docs/User_Guide/topics/Creating_a_Bucket.htm
-credetials.yaml
+* Create Bucket with name *terraform-state* in *eu-central-1* region, [see](https://wasabi.com/wp-content/themes/wasabi/docs/User_Guide/topics/Creating_a_Bucket.htm)
+* Asign access key, [see](https://wasabi.com/wp-content/themes/wasabi/docs/Getting_Started/topics/Assigning_an_Access_Key.htm)
+
+### Cloudflare
+
+* Create free plan
+
+* Change your nameservers
+> Log in to your registrar account -  Replace with Cloudflare's nameservers:
+> Registrars typically process nameserver updates within 24 hours. Once this process > completes, Cloudflare confirms your site activation via email.
 
 
-## Install
 
-### Provision servers
+Add the following parameters to the file <PROJECT_ID>.tfvars in *environments* folder.
+```
+domain =
+email = 
+dns_api_token =
+```
+| Name  | Description  | 
+|---|---|
+| domain  | Domain  | 
+| email  | Cloudflare login email  | 
+| dns_api_token  | Cloudflare Global API Key | 
 
-```bash
-sudo terraform apply -var-file="environments/hc-dev.tfvars"  -auto-approve
+### Concourse CI
+
+Add the following parameters to the file *credetials.yaml* in *ci* folder.
+
+```
+terraform-backend-access-key:
+terraform-backend-secret-key:
+git-crypt-key: 
 ```
 
-### Provision Kubernetes
+| Name  | Description  | 
+|---|---|
+| terraform-backend-access-key  | Wasabi S3 access key  | 
+| terraform-backend-secret-key  | Wasabi S3 secret key  | 
+| git-crypt-key  | git-crypt export-key -- - `|` base64 | 
 
-#### Download Kuberspray
+Run CI server 
+
 ```bash
-git clone git@github.com:kubernetes-sigs/kubespray.git
-
-cd kubespray
-
-# RELEASE_TAG = Kubespray version (for example v2.10.4)
-git checkout <RELEASE_TAG>
+./ci.sh up
 ```
-
-#### Run ansible-playbook
-
-Set *ANSIBLE_INVALID_TASK_ATTRIBUTE_FAILED* to *false* because of Ansible 2.8.x ( [see kubespray issue]( https://github.com/kubernetes-sigs/kubespray/issues/3985), and [ansible issue]( https://github.com/ansible/ansible/issues/56072))
-```bash
-export ANSIBLE_INVALID_TASK_ATTRIBUTE_FAILED=False
-```
-```bash
-# run inside kubespray directory
-ansible-playbook -i ../inventories/default/hosts.ini cluster.yml --extra-vars "@../inventories/default/variables.json"
-```
-
-## CI
-
-git-crypt export-key -- - | base64
 
 ## Roadmap
 * Floating IP - https://www.terraform.io/docs/providers/hcloud/r/floating_ip.html
-* DNS Management
 * SSL Cert Management
-* Metallb Deployment
+* K8s storage
