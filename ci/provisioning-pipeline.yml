@@ -5,6 +5,18 @@ resource_types:
     repository: totr/terraform-kube-builder
     tag: latest
 
+- name: ansible
+  type: docker-image
+  source:
+    repository: totr/kubespray-builder
+    tag: latest
+
+- name: kubernetes
+  type: docker-image
+  source:
+    repository: zlabjp/kubernetes-resource
+    tag: "1.15"
+
 resources:
 - name: terraform-state
   type: terraform 
@@ -17,11 +29,25 @@ resources:
       endpoint: "https://s3.eu-central-1.wasabisys.com"
       skip_credentials_validation: true
       skip_metadata_api_check: true
-      bucket: terraform-state
+      bucket: terraform-kube
       key: terraform.tfstate
       region: eu-central-1
       access_key: ((terraform-backend-access-key))
       secret_key: ((terraform-backend-secret-key))
+
+- name: kubeconfig
+  icon: database
+  type: s3
+  source:
+    endpoint: "https://s3.eu-central-1.wasabisys.com"
+    region_name: eu-central-1
+    bucket: terraform-kube
+    versioned_file: env:/((env-name))/kubeconfig.yaml
+    access_key_id: ((terraform-backend-access-key))
+    secret_access_key: ((terraform-backend-secret-key))
+
+- name: k8s-argocd
+  type: kubernetes
 
 - name: terraform-kube
   type: git
@@ -31,15 +57,25 @@ resources:
     branch: master
     git_crypt_key: ((git-crypt-key))
 
+- name: ansible-playbook
+  type: ansible
+  source:
+    debug: false
+    user: ubuntu
+    ssh_private_key: ""
+    env:
+      ANSIBLE_INVALID_TASK_ATTRIBUTE_FAILED: "False"
+    verbose: v
+
 - name: kubespray
   type: git
   icon: github-circle
   source:
     uri: https://github.com/kubernetes-sigs/kubespray.git
-    tag_filter: v2.10.4
+    tag_filter: v2.11.0
 
 jobs:
-- name: terraform-apply
+- name: create-servers
   plan:
     - get: terraform-kube
       trigger: true
@@ -49,12 +85,76 @@ jobs:
         var_files: [terraform-kube/environments/((env-name)).tfvars]
         terraform_source: terraform-kube
 
-- name: kubespray-run
+- name: deploy-k8s-cluster
   plan:
     - get: kubespray
     - get: terraform-state
-      trigger: false
-      passed: [terraform-apply]
+      trigger: true
+      passed: [create-servers]
       params:
-        env_name: ((env-name))
-        terraform_source: terraform-kube
+        output_statefile: true
+    - task: kubespray-inventory
+      config:
+        platform: linux
+        image_resource:
+          type: registry-image
+          source: { repository: colstrom/jq }
+        inputs:
+        - name: terraform-state
+        run:
+          path: sh
+          args:
+          - -c
+          - |
+              echo "Environment name: $(cat terraform-state/name)"
+              mkdir -p inventory/group_vars/k8s-cluster
+              cat terraform-state/metadata | jq .kubespray_inventory --raw-output > inventory/hosts.ini
+              cat terraform-state/metadata | jq .kubespray_cluster_vars --raw-output > inventory/group_vars/k8s-cluster/k8s-cluster.yml
+              cat terraform-state/metadata | jq .kubespray_addons_vars --raw-output > inventory/group_vars/k8s-cluster/addons.yml
+              cat terraform-state/metadata | jq .ssh_private_key --raw-output > inventory/ssh.key
+              cat terraform-state/metadata | jq .master_nodes[0].public_ip --raw-output > inventory/k8s-master-1-ip.txt
+              cat terraform-state/metadata | jq .master_nodes[0].private_ip --raw-output >> inventory/k8s-master-1-ip.txt
+              chmod 600 inventory/ssh.key
+        outputs:
+        - name: inventory
+    - put: ansible-playbook
+      params:
+        inventory: inventory/hosts.ini
+        playbook: kubespray/cluster.yml
+        path: /
+    - task: get-kubeconfig
+      config:
+        platform: linux
+        image_resource:
+          type: registry-image
+          source:
+            repository: kroniak/ssh-client
+            tag: 3.9
+        inputs:
+        - name: inventory
+        outputs: 
+        - name: k8s-conf
+        run:
+          path: sh
+          args:
+          - -c
+          - |
+              K8S_MASTER_1_PUBLIC_IP=$(sed -n 1p inventory/k8s-master-1-ip.txt)
+              K8S_MASTER_1_PRIVATE_IP=$(sed -n 2p inventory/k8s-master-1-ip.txt)
+              ssh -i inventory/ssh.key -o "StrictHostKeyChecking=no" root@$K8S_MASTER_1_PUBLIC_IP 'cat /etc/kubernetes/admin.conf' > k8s-conf/admin.conf
+              sed -i "s/$K8S_MASTER_1_PRIVATE_IP/$K8S_MASTER_1_PUBLIC_IP/g" k8s-conf/admin.conf
+    - put: kubeconfig
+      params:
+        file: k8s-conf/admin.conf
+
+- name: deploy-k8s-components
+  plan:
+  - get: terraform-kube
+  - get: kubeconfig
+    trigger: true
+    passed: [deploy-k8s-cluster]
+  - put: k8s-argocd
+    params:
+      kubectl: apply -f terraform-kube/k8s-manifests/argocd/namespace.yaml -f https://raw.githubusercontent.com/argoproj/argo-cd/v1.2.0/manifests/ha/install.yaml -n argocd-system
+      wait_until_ready_selector: app.kubernetes.io/name=argocd-server
+      kubeconfig_file: kubeconfig/kubeconfig.yaml
