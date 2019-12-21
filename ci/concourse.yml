@@ -33,7 +33,7 @@ services:
    command: "sh -c '/wait && fly --target provisioner login -c http://concourse:8080/ -u admin -p admin \
             && fly -t provisioner sp -p k8s-provisioning -c ci/provisioning-pipeline.yml -n -l ci/credentials.yaml -v env-name=hc-dev \
             && fly -t provisioner sp -p k8s-destroying -c ci/destroying-pipeline.yml -n -l ci/credentials.yaml -v env-name=hc-dev'"
-   volumes: ["./ci:/ci"]
+   volumes: [".:/ci"]
    depends_on:
      - concourse
    environment:

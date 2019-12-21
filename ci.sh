@@ -5,7 +5,7 @@ if [ "$1" == "up" ]; then
 	extra_args="-d --force-recreate"
 fi
 
-if (docker-compose -f concourse-ci.yml $1 $extra_args); then
+if (docker-compose -f ci/concourse.yml $1 $extra_args); then
 	if [ "$1" == "up" ]; then
 		echo ""
 		echo "----------------------------------------------------------------"
