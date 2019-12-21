@@ -6,7 +6,6 @@
 *.tfstate.*
 
 # Concourse ci
-concourse-ci.yml
 credentials.yaml
 
 # Crash log files

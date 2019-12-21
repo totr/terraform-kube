@@ -1,0 +1,40 @@
+# FROM https://concourse-ci.org/docker-compose.yml
+version: '3'
+
+services:
+  concourse-db:
+    image: postgres:11.4
+    environment:
+      POSTGRES_DB: concourse
+      POSTGRES_PASSWORD: concourse_pass
+      POSTGRES_USER: concourse_user
+      PGDATA: /database
+
+  concourse:
+    image: concourse/concourse:5.4
+    command: quickstart
+    privileged: true
+    depends_on: [concourse-db]
+    ports: ["8080:8080"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+    environment:
+      CONCOURSE_POSTGRES_HOST: concourse-db
+      CONCOURSE_POSTGRES_USER: concourse_user
+      CONCOURSE_POSTGRES_PASSWORD: concourse_pass
+      CONCOURSE_POSTGRES_DATABASE: concourse
+      CONCOURSE_EXTERNAL_URL: http://localhost:8080
+      CONCOURSE_ADD_LOCAL_USER: admin:admin
+      CONCOURSE_MAIN_TEAM_LOCAL_USER: admin
+      CONCOURSE_WORKER_BAGGAGECLAIM_DRIVER: overlay
+
+  concourse-fly:
+   image: totr/concourse-fly:5.4.0
+   command: "sh -c '/wait && fly --target provisioner login -c http://concourse:8080/ -u admin -p admin \
+            && fly -t provisioner sp -p k8s-provisioning -c ci/provisioning-pipeline.yml -n -l ci/credentials.yaml -v env-name=hc-dev \
+            && fly -t provisioner sp -p k8s-destroying -c ci/destroying-pipeline.yml -n -l ci/credentials.yaml -v env-name=hc-dev'"
+   volumes: ["./ci:/ci"]
+   depends_on:
+     - concourse
+   environment:
+      WAIT_HOSTS: concourse:8080
