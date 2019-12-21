@@ -3,19 +3,19 @@ resource_types:
   type: docker-image
   source:
     repository: totr/terraform-kube-builder
-    tag: latest
+    tag: 0.12.18
 
 - name: ansible
   type: docker-image
   source:
     repository: totr/kubespray-builder
-    tag: latest
+    tag: 2.0.0
 
 - name: kubernetes
   type: docker-image
   source:
     repository: zlabjp/kubernetes-resource
-    tag: "1.15"
+    tag: "1.16"
 
 resources:
 - name: terraform-state
@@ -72,7 +72,7 @@ resources:
   icon: github-circle
   source:
     uri: https://github.com/kubernetes-sigs/kubespray.git
-    tag_filter: v2.11.0
+    tag_filter: v2.12.0
 
 jobs:
 - name: create-servers
@@ -155,6 +155,6 @@ jobs:
     passed: [deploy-k8s-cluster]
   - put: k8s-argocd
     params:
-      kubectl: apply -f terraform-kube/k8s-manifests/argocd/namespace.yaml -f https://raw.githubusercontent.com/argoproj/argo-cd/v1.2.0/manifests/ha/install.yaml -n argocd-system
+      kubectl: apply -f terraform-kube/k8s-manifests/argocd/namespace.yaml -f https://raw.githubusercontent.com/argoproj/argo-cd/v1.3.6/manifests/ha/install.yaml -n argocd-system
       wait_until_ready_selector: app.kubernetes.io/name=argocd-server
       kubeconfig_file: kubeconfig/kubeconfig.yaml

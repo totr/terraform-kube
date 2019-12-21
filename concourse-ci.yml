@@ -3,7 +3,7 @@ version: '3'
 
 services:
   concourse-db:
-    image: postgres:11.4
+    image: postgres:12.1
     environment:
       POSTGRES_DB: concourse
       POSTGRES_PASSWORD: concourse_pass
@@ -11,7 +11,7 @@ services:
       PGDATA: /database
 
   concourse:
-    image: concourse/concourse:5.4
+    image: concourse/concourse:5.5.7
     command: quickstart
     privileged: true
     depends_on: [concourse-db]
@@ -29,7 +29,7 @@ services:
       CONCOURSE_WORKER_BAGGAGECLAIM_DRIVER: overlay
 
   concourse-fly:
-   image: totr/concourse-fly:5.4.0
+   image: totr/concourse-fly:5.5.7
    command: "sh -c '/wait && fly --target provisioner login -c http://concourse:8080/ -u admin -p admin \
             && fly -t provisioner sp -p k8s-provisioning -c ci/provisioning-pipeline.yml -n -l ci/credentials.yaml -v env-name=hc-dev \
             && fly -t provisioner sp -p k8s-destroying -c ci/destroying-pipeline.yml -n -l ci/credentials.yaml -v env-name=hc-dev'"

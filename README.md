@@ -14,10 +14,10 @@
 	- [Roadmap](#roadmap)
 
 ## Prerequisites
-* Docker Compose >= 1.22.0
-* HetznerCloud Servers (3x CX21, [see](https://www.hetzner.com/cloud#))
-* Wasabi S3 Storage (https://wasabi.com)
-* Cloudflare free plan
+* Docker Compose >= 1.24.0
+* HetznerCloud Servers ([3x CX21](https://www.hetzner.com/cloud#))
+* [Wasabi](https://wasabi.com) S3 Storage
+* [Cloudflare](https://www.cloudflare.com) free plan 
 * [Git-crypt](https://github.com/AGWA/git-crypt)
 
 ## Getting started
@@ -66,7 +66,7 @@ dns_api_token =
 
 ### Concourse CI
 
-Add the following parameters to the file *credetials.yaml* in *ci* folder.
+Add the following parameters to the file *credentials.yaml* in *ci* folder.
 
 ```
 terraform-backend-access-key:
