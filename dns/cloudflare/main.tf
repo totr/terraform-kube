@@ -1,11 +1,23 @@
+locals {
+  zone_id = lookup(data.cloudflare_zones.domain_zones.zones[0], "id")
+}
+
 provider "cloudflare" {
-  version = "~> 1.18"
+  version = "~> 2.3"
   email = var.email
-  token = var.api_token
+  api_key = var.api_token
+}
+
+data "cloudflare_zones" "domain_zones" {
+  filter {
+    name   = var.domain
+    status = "active"
+    paused = false
+  }
 }
 
 resource "cloudflare_record" "domain" {
-  domain  = var.domain
+  zone_id  = local.zone_id
   name    = var.domain
   value   = element(var.public_ips, 0)
   type    = "A"
@@ -13,9 +25,9 @@ resource "cloudflare_record" "domain" {
 }
 
 resource "cloudflare_record" "wildcard" {
-  depends_on = ["cloudflare_record.domain"]
+  depends_on = [cloudflare_record.domain]
 
-  domain  = var.domain
+  zone_id  = local.zone_id
   name    = "*"
   value   = var.domain
   type    = "CNAME"

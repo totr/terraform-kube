@@ -80,10 +80,16 @@ git-crypt-key:
 | terraform-backend-secret-key  | Wasabi S3 secret key  | 
 | git-crypt-key  | git-crypt export-key -- - `|` base64 | 
 
-Run CI server 
+Start CI server 
 
 ```bash
 ./ci.sh up
+```
+
+Stop CI server 
+
+```bash
+./ci.sh down
 ```
 
 ## Roadmap

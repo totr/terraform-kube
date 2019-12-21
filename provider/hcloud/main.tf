@@ -1,5 +1,5 @@
 provider "hcloud" {
-  version = "~> 1.11"
+  version = "~> 1.15"
   token   = var.provider_token
 }
 

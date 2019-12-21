@@ -1,5 +1,5 @@
 provider "local" {
-  version = "~> 1.3"
+  version = "~> 1.4"
 }
 
 provider "null" {
@@ -15,7 +15,7 @@ provider "template" {
 }
 
 provider "tls" {
-  version = "~> 2.0"
+  version = "~> 2.1"
 }
 
 module "provider" {
