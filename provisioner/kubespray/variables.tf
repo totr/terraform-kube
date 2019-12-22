@@ -14,6 +14,10 @@ variable "worker_nodes" {
   }))
 }
 
+variable "vpn_ips" {
+  type = map
+}
+
 variable "kube_service_addresses" {
   type = string
 }

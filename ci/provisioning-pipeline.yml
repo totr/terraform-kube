@@ -113,7 +113,6 @@ jobs:
               cat terraform-state/metadata | jq .kubespray_addons_vars --raw-output > inventory/group_vars/k8s-cluster/addons.yml
               cat terraform-state/metadata | jq .ssh_private_key --raw-output > inventory/ssh.key
               cat terraform-state/metadata | jq .master_nodes[0].public_ip --raw-output > inventory/k8s-master-1-ip.txt
-              cat terraform-state/metadata | jq .master_nodes[0].private_ip --raw-output >> inventory/k8s-master-1-ip.txt
               chmod 600 inventory/ssh.key
         outputs:
         - name: inventory
@@ -140,9 +139,8 @@ jobs:
           - -c
           - |
               K8S_MASTER_1_PUBLIC_IP=$(sed -n 1p inventory/k8s-master-1-ip.txt)
-              K8S_MASTER_1_PRIVATE_IP=$(sed -n 2p inventory/k8s-master-1-ip.txt)
               ssh -i inventory/ssh.key -o "StrictHostKeyChecking=no" root@$K8S_MASTER_1_PUBLIC_IP 'cat /etc/kubernetes/admin.conf' > k8s-conf/admin.conf
-              sed -i "s/$K8S_MASTER_1_PRIVATE_IP/$K8S_MASTER_1_PUBLIC_IP/g" k8s-conf/admin.conf
+              sed -i "s/https.*6443/https:\/\/$K8S_MASTER_1_PUBLIC_IP:6443/g" k8s-conf/admin.conf
     - put: kubeconfig
       params:
         file: k8s-conf/admin.conf
