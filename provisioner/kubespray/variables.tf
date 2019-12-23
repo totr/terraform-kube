@@ -18,6 +18,10 @@ variable "vpn_ips" {
   type = map
 }
 
+variable "kube_network_plugin" {
+  type = string
+}
+
 variable "kube_service_addresses" {
   type = string
 }

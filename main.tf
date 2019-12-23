@@ -64,6 +64,7 @@ module "provisioner" {
   master_nodes           = module.provider.master_nodes
   worker_nodes           = module.provider.worker_nodes
   vpn_ips                = module.vpn.vpn_ips
+  kube_network_plugin    = var.kube_network_plugin
   kube_service_addresses = var.kube_service_addresses
   kube_pods_subnet       = var.kube_pods_subnet
 }
