@@ -1,5 +1,5 @@
-variable "public_ips" {
-  type = list(string)
+variable "floating_ip" {
+  type = string
 }
 
 variable "domain" {

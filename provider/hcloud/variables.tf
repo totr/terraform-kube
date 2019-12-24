@@ -32,6 +32,11 @@ variable "provider_network_zone" {
   default = "eu-central"
 }
 
+variable "provider_floating_ip_location" {
+  type    = string
+  default = "nbg1"
+}
+
 variable "master_nodes_count" {
   type = string
 }

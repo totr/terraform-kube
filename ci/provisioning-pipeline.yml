@@ -108,11 +108,14 @@ jobs:
           - |
               echo "Environment name: $(cat terraform-state/name)"
               mkdir -p inventory/group_vars/k8s-cluster
-              cat terraform-state/metadata | jq .kubespray_inventory --raw-output > inventory/hosts.ini
-              cat terraform-state/metadata | jq .kubespray_cluster_vars --raw-output > inventory/group_vars/k8s-cluster/k8s-cluster.yml
-              cat terraform-state/metadata | jq .kubespray_addons_vars --raw-output > inventory/group_vars/k8s-cluster/addons.yml
-              cat terraform-state/metadata | jq .ssh_private_key --raw-output > inventory/ssh.key
-              cat terraform-state/metadata | jq .master_nodes[0].public_ip --raw-output > inventory/k8s-master-1-ip.txt
+              mkdir -p inventory/group_vars/all
+              TERRAFORM_STATE_METADATA=$(cat terraform-state/metadata)
+              echo $TERRAFORM_STATE_METADATA | jq .kubespray_inventory --raw-output > inventory/hosts.ini
+              echo $TERRAFORM_STATE_METADATA | jq .kubespray_cluster_vars --raw-output > inventory/group_vars/k8s-cluster/k8s-cluster.yml
+              echo $TERRAFORM_STATE_METADATA | jq .kubespray_addons_vars --raw-output > inventory/group_vars/k8s-cluster/addons.yml
+              echo $TERRAFORM_STATE_METADATA | jq .kubespray_addons_vars --raw-output > inventory/group_vars/all/all.yml
+              echo $TERRAFORM_STATE_METADATA | jq .ssh_private_key --raw-output > inventory/ssh.key
+              echo $TERRAFORM_STATE_METADATA | jq .master_nodes[0].public_ip --raw-output > inventory/k8s-master-1-ip.properties
               chmod 600 inventory/ssh.key
         outputs:
         - name: inventory
@@ -138,7 +141,7 @@ jobs:
           args:
           - -c
           - |
-              K8S_MASTER_1_PUBLIC_IP=$(sed -n 1p inventory/k8s-master-1-ip.txt)
+              K8S_MASTER_1_PUBLIC_IP=$(sed -n 1p inventory/k8s-master-1-ip.properties)
               ssh -i inventory/ssh.key -o "StrictHostKeyChecking=no" root@$K8S_MASTER_1_PUBLIC_IP 'cat /etc/kubernetes/admin.conf' > k8s-conf/admin.conf
               sed -i "s/https.*6443/https:\/\/$K8S_MASTER_1_PUBLIC_IP:6443/g" k8s-conf/admin.conf
     - put: kubeconfig

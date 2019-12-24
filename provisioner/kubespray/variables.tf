@@ -18,6 +18,10 @@ variable "vpn_ips" {
   type = map
 }
 
+variable "floating_ip" {
+   type = string
+}
+
 variable "kube_network_plugin" {
   type = string
 }

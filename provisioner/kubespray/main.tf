@@ -24,13 +24,17 @@ locals {
     worker_nodes = local.workers
   })
 
-  cluster_vars = templatefile("${path.module}/templates/k8s-cluster.yml", {
+  cluster_vars = templatefile("${path.module}/templates/k8s-cluster.yaml", {
     kube_service_addresses = var.kube_service_addresses
     kube_pods_subnet       = var.kube_pods_subnet
     kube_network_plugin    = var.kube_network_plugin
   })
 
-	addons_vars = templatefile("${path.module}/templates/addons.yml", {
+  all_vars = templatefile("${path.module}/templates/all.yaml", {
+    floating_ip = var.floating_ip
+  })
+
+	addons_vars = templatefile("${path.module}/templates/addons.yaml", {
 
   })
 }

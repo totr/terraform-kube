@@ -18,6 +18,14 @@ output "ssh_private_key" {
   value = tls_private_key.access_key.private_key_pem
 }
 
+output "floating_ip_id" {
+  value = hcloud_floating_ip.master.id
+}
+
+output "floating_ip" {
+  value = hcloud_floating_ip.master.ip_address
+}
+
 output "master_nodes" {
   value = flatten([
     for i in hcloud_server.host[*] : {

@@ -53,3 +53,13 @@ resource "hcloud_server_network" "srvethn" {
   ip         = cidrhost(hcloud_network_subnet.privatesubnet.ip_range, count.index + 2)
   count      = var.master_nodes_count + var.worker_nodes_count
 }
+
+resource "hcloud_floating_ip" "master" {
+  type = "ipv4"
+  home_location = var.provider_floating_ip_location
+}
+
+resource "hcloud_floating_ip_assignment" "main" {
+  floating_ip_id = hcloud_floating_ip.master.id
+  server_id = element(hcloud_server.host[*].id, 0)
+}

@@ -19,7 +19,7 @@ data "cloudflare_zones" "domain_zones" {
 resource "cloudflare_record" "domain" {
   zone_id  = local.zone_id
   name    = var.domain
-  value   = element(var.public_ips, 0)
+  value   = var.floating_ip
   type    = "A"
   proxied = true
 }

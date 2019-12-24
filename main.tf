@@ -52,10 +52,10 @@ module "firewall" {
 module "dns" {
   source = "./dns/cloudflare"
 
-  public_ips = module.provider.public_ips
-  domain     = var.domain
-  email      = var.email
-  api_token  = var.dns_api_token
+  floating_ip = module.provider.floating_ip
+  domain      = var.domain
+  email       = var.email
+  api_token   = var.dns_api_token
 }
 
 module "provisioner" {
@@ -64,6 +64,7 @@ module "provisioner" {
   master_nodes           = module.provider.master_nodes
   worker_nodes           = module.provider.worker_nodes
   vpn_ips                = module.vpn.vpn_ips
+  floating_ip            = module.provider.floating_ip
   kube_network_plugin    = var.kube_network_plugin
   kube_service_addresses = var.kube_service_addresses
   kube_pods_subnet       = var.kube_pods_subnet
