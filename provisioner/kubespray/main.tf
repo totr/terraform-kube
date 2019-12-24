@@ -30,11 +30,7 @@ locals {
     kube_network_plugin    = var.kube_network_plugin
   })
 
-  all_vars = templatefile("${path.module}/templates/all.yaml", {
-    floating_ip = var.floating_ip
-  })
-
 	addons_vars = templatefile("${path.module}/templates/addons.yaml", {
-
+    floating_ip = var.floating_ip
   })
 }

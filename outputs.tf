@@ -21,7 +21,3 @@ output "kubespray_cluster_vars" {
 output "kubespray_addons_vars" {
   value = module.provisioner.addons_vars
 }
-
-output "kubespray_all_vars" {
-  value = module.provisioner.all_vars
-}

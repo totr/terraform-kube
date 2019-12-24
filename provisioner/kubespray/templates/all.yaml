@@ -1,3 +1,0 @@
-metallb:
-  ip_range: "${floating_ip}-${floating_ip}"
-  version: v0.8.3

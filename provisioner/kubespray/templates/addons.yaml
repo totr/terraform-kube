@@ -1,1 +1,9 @@
 helm_enabled: true
+metallb:
+  limits:
+    cpu: "100m"
+    memory: "100Mi"
+  protocol: "layer2"
+  ip_range: "${floating_ip}-${floating_ip}"
+  port: "7472"
+  version: v0.8.3
