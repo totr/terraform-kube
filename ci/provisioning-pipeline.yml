@@ -9,7 +9,7 @@ resource_types:
   type: docker-image
   source:
     repository: totr/kubespray-builder
-    tag: 2.0.0
+    tag: 2.0.2
 
 - name: kubernetes
   type: docker-image
@@ -112,7 +112,7 @@ jobs:
               cat terraform-state/metadata | jq .kubespray_cluster_vars --raw-output > inventory/group_vars/k8s-cluster/k8s-cluster.yml
               cat terraform-state/metadata | jq .kubespray_addons_vars --raw-output > inventory/group_vars/k8s-cluster/addons.yml
               cat terraform-state/metadata | jq .ssh_private_key --raw-output > inventory/ssh.key
-              cat terraform-state/metadata | jq .master_nodes[0].public_ip --raw-output > inventory/k8s-master-1-ip.properties
+              cat terraform-state/metadata | jq .master_nodes[0].public_ip --raw-output > inventory/k8s-master-1-ip.ini
               chmod 600 inventory/ssh.key
         outputs:
         - name: inventory
@@ -145,7 +145,7 @@ jobs:
           args:
           - -c
           - |
-              K8S_MASTER_1_PUBLIC_IP=$(sed -n 1p inventory/k8s-master-1-ip.properties)
+              K8S_MASTER_1_PUBLIC_IP=$(sed -n 1p inventory/k8s-master-1-ip.ini)
               ssh -i inventory/ssh.key -o "StrictHostKeyChecking=no" root@$K8S_MASTER_1_PUBLIC_IP 'cat /etc/kubernetes/admin.conf' > k8s-conf/admin.conf
               sed -i "s/https.*6443/https:\/\/$K8S_MASTER_1_PUBLIC_IP:6443/g" k8s-conf/admin.conf
     - put: kubeconfig
@@ -158,8 +158,54 @@ jobs:
   - get: kubeconfig
     trigger: true
     passed: [deploy-k8s-cluster]
-  - put: k8s-argocd
+  - put: argocd-deploy
+    resource: k8s-argocd
     params:
-      kubectl: apply -f terraform-kube/k8s-manifests/argocd/namespace.yaml -f https://raw.githubusercontent.com/argoproj/argo-cd/v1.3.6/manifests/ha/install.yaml -n argocd-system
+      kubectl: apply -f terraform-kube/k8s-manifests/argocd/namespace.yaml -f https://raw.githubusercontent.com/argoproj/argo-cd/v1.3.6/manifests/ha/install.yaml -n argocd
+      wait_until_ready_selector: app.kubernetes.io/name=argocd-server
+      kubeconfig_file: kubeconfig/kubeconfig.yaml
+  - task: argocd-generate-password
+    config:
+      image_resource:
+        type: docker-image
+        source:
+          repository: totr/kubespray-builder
+          tag: 2.0.2
+      platform: linux
+      run:
+        path: sh
+        args:
+        - -c
+        - |
+            htpasswd -bnBC 10 "" $(cat terraform-kube/environments/((env-name)).tfvars | grep k8s_argocd_admin_pass | cut -d'=' -f2) | tr -d ':\n' > argocd-config/argocd-admin-pass.ini
+      outputs:
+        - name: argocd-config
+  - put: argocd-configure-auth
+    resource: k8s-argocd
+    params:
+      kubectl: | 
+        patch secret -n argocd argocd-secret -p '{"stringData":{"admin.password":"'$(cat argocd-config/argocd-admin-pass.ini)'"}}'
+      kubeconfig_file: kubeconfig/kubeconfig.yaml
+  - put: argocd-delete-global-config
+    resource: k8s-argocd
+    params:
+      kubectl: | 
+        delete configmap -n argocd argocd-cm --ignore-not-found
+      kubeconfig_file: kubeconfig/kubeconfig.yaml
+  - put: argocd-create-global-config
+    resource: k8s-argocd
+    params:
+      kubectl: | 
+        apply -n argocd -f terraform-kube/k8s-manifests/argocd/configmap.yaml
+      kubeconfig_file: kubeconfig/kubeconfig.yaml
+  - put: argocd-create-project
+    resource: k8s-argocd
+    params:
+      kubectl: apply -n argocd -f terraform-kube/k8s-manifests/argocd/project.yaml
+      kubeconfig_file: kubeconfig/kubeconfig.yaml
+  - put: argocd-restart
+    resource: k8s-argocd
+    params:
+      kubectl: delete pods -n argocd -l app.kubernetes.io/name=argocd-server
       wait_until_ready_selector: app.kubernetes.io/name=argocd-server
       kubeconfig_file: kubeconfig/kubeconfig.yaml
