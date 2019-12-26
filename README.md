@@ -11,6 +11,7 @@
 		- [Wasabi S3 Storage for Terraform state](#wasabi-s3-storage-for-terraform-state)
 		- [Cloudflare](#cloudflare)
 		- [Concourse CI](#concourse-ci)
+		- [Kubernetes ArgoCD](#kubernetes-argocd)
 	- [Roadmap](#roadmap)
 
 ## Prerequisites
@@ -64,6 +65,16 @@ dns_api_token =
 | email  | Cloudflare login email  | 
 | dns_api_token  | Cloudflare Global API Key | 
 
+### Kubernetes ArgoCD
+Add the following parameter to the file <PROJECT_ID>.tfvars in *environments* folder.
+```
+k8s_argocd_admin_pass =
+```
+| Name  | Description  | 
+|---|---|
+| k8s_argocd_admin_pass  | ArgoCD password for admin user | 
+
+
 ### Concourse CI
 
 Add the following parameters to the file *credentials.yaml* in *ci* folder.
@@ -93,6 +104,7 @@ Stop CI server
 ```
 
 ## Roadmap
-* Floating IP - https://www.terraform.io/docs/providers/hcloud/r/floating_ip.html
+* Floating IP reassigner - https://github.com/cbeneke/hcloud-fip-controller
 * SSL Cert Management
 * K8s storage
+* Better documentation (Mkdoc - https://github.com/kubernetes/ingress-nginx/blob/master/mkdocs.yml)

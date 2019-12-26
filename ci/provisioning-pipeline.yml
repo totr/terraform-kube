@@ -172,12 +172,14 @@ jobs:
           repository: totr/kubespray-builder
           tag: 2.0.2
       platform: linux
+      inputs:
+      - name: terraform-kube
       run:
         path: sh
         args:
         - -c
         - |
-            htpasswd -bnBC 10 "" $(cat terraform-kube/environments/((env-name)).tfvars | grep k8s_argocd_admin_pass | cut -d'=' -f2) | tr -d ':\n' > argocd-config/argocd-admin-pass.ini
+            htpasswd -bnBC 10 "" $(cat terraform-kube/environments/((env-name)).tfvars | grep k8s_argocd_admin_pass | cut -d'=' -f2 | tr -d \") | tr -d ':\n' > argocd-config/argocd-admin-pass.ini
       outputs:
         - name: argocd-config
   - put: argocd-configure-auth
