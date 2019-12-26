@@ -63,3 +63,20 @@ resource "hcloud_floating_ip_assignment" "main" {
   floating_ip_id = hcloud_floating_ip.master.id
   server_id = element(hcloud_server.host[*].id, 0)
 }
+
+resource "null_resource" "host_floating_ip" {
+  count = var.master_nodes_count + var.worker_nodes_count
+
+  connection {
+    host        = element(hcloud_server.host[*].ipv4_address, count.index)
+    private_key = tls_private_key.access_key.private_key_pem
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      templatefile("${path.module}/scripts/floating-ip.sh", {
+        floating_ip = hcloud_floating_ip.master.ip_address
+      })
+    ]
+  }
+}
