@@ -106,5 +106,4 @@ Stop CI server
 ## Roadmap
 * Floating IP reassigner - https://github.com/cbeneke/hcloud-fip-controller
 * SSL Cert Management
-* K8s storage
 * Better documentation (Mkdoc - https://github.com/kubernetes/ingress-nginx/blob/master/mkdocs.yml)

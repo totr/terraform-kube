@@ -46,7 +46,7 @@ resources:
     access_key_id: ((terraform-backend-access-key))
     secret_access_key: ((terraform-backend-secret-key))
 
-- name: k8s-argocd
+- name: k8s-components
   type: kubernetes
 
 - name: terraform-kube
@@ -158,8 +158,19 @@ jobs:
   - get: kubeconfig
     trigger: true
     passed: [deploy-k8s-cluster]
+  - put: storage-driver-create-config
+    resource: k8s-components
+    params:
+      kubectl: create -n kube-system secret generic hcloud-csi --from-literal=token=$(cat terraform-kube/environments/((env-name)).tfvars | grep provider_storage_token | cut -d'=' -f2 | tr -d \" | xargs)
+      kubeconfig_file: kubeconfig/kubeconfig.yaml
+  - put: storage-driver-deploy
+    resource: k8s-components
+    params:
+      kubectl: apply -n kube-system -f https://raw.githubusercontent.com/hetznercloud/csi-driver/v1.2.2/deploy/kubernetes/hcloud-csi.yml
+      wait_until_ready_selector: app=hcloud-csi
+      kubeconfig_file: kubeconfig/kubeconfig.yaml
   - put: argocd-deploy
-    resource: k8s-argocd
+    resource: k8s-components
     params:
       kubectl: apply -f terraform-kube/k8s-manifests/argocd/namespace.yaml -f https://raw.githubusercontent.com/argoproj/argo-cd/v1.3.6/manifests/ha/install.yaml -n argocd
       wait_until_ready_selector: app.kubernetes.io/name=argocd-server
@@ -183,30 +194,30 @@ jobs:
       outputs:
         - name: argocd-config
   - put: argocd-configure-auth
-    resource: k8s-argocd
+    resource: k8s-components
     params:
       kubectl: | 
         patch secret -n argocd argocd-secret -p '{"stringData":{"admin.password":"'$(cat argocd-config/argocd-admin-pass.ini)'"}}'
       kubeconfig_file: kubeconfig/kubeconfig.yaml
   - put: argocd-delete-global-config
-    resource: k8s-argocd
+    resource: k8s-components
     params:
       kubectl: | 
         delete configmap -n argocd argocd-cm --ignore-not-found
       kubeconfig_file: kubeconfig/kubeconfig.yaml
   - put: argocd-create-global-config
-    resource: k8s-argocd
+    resource: k8s-components
     params:
       kubectl: | 
         apply -n argocd -f terraform-kube/k8s-manifests/argocd/configmap.yaml
       kubeconfig_file: kubeconfig/kubeconfig.yaml
   - put: argocd-register-default-infra-apps
-    resource: k8s-argocd
+    resource: k8s-components
     params:
       kubectl: apply -n argocd -f terraform-kube/k8s-manifests/argocd/default-infra-apps.yaml
       kubeconfig_file: kubeconfig/kubeconfig.yaml
   - put: argocd-restart
-    resource: k8s-argocd
+    resource: k8s-components
     params:
       kubectl: delete pods -n argocd -l app.kubernetes.io/name=argocd-server
       wait_until_ready_selector: app.kubernetes.io/name=argocd-server
