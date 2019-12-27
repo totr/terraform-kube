@@ -200,10 +200,10 @@ jobs:
       kubectl: | 
         apply -n argocd -f terraform-kube/k8s-manifests/argocd/configmap.yaml
       kubeconfig_file: kubeconfig/kubeconfig.yaml
-  - put: argocd-create-project
+  - put: argocd-register-default-infra-apps
     resource: k8s-argocd
     params:
-      kubectl: apply -n argocd -f terraform-kube/k8s-manifests/argocd/project.yaml
+      kubectl: apply -n argocd -f terraform-kube/k8s-manifests/argocd/default-infra-apps.yaml
       kubeconfig_file: kubeconfig/kubeconfig.yaml
   - put: argocd-restart
     resource: k8s-argocd

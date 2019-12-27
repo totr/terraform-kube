@@ -11,14 +11,13 @@ spec:
     server: https://kubernetes.default.svc
   project: default
   source:
-    directory:
-      recurse: true
     path: apps
     repoURL: https://github.com/totr/argocd-infra-apps.git
     targetRevision: HEAD
+    helm:
+      valueFiles:
+        - values.yaml
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
-status:
-  sourceType: Helm
