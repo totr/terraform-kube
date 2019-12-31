@@ -1,0 +1,32 @@
+site_name: Terraform Kube
+site_author: Tomas Trnka
+strict: true
+repo_name: "totr/terraform-kube"
+repo_url: https://github.com/totr/terraform-kube
+site_url: https://github.com/totr/terraform-kube
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - meta
+  - toc:
+      permalink: true
+theme:
+  name: material
+  feature:
+    tabs: true
+  include_sidebar: true
+  palette:
+    primary: 'black'
+    accent: 'black'
+
+plugins:
+  - search
+
+nav:
+  - Welcome: index.md
+  - User guide: 
+    - Prerequisites: prerequisites.md
+    - Getting started: getting-started.md
+  - Roadmap: 
+    - Roadmap: roadmap.md
