@@ -5,3 +5,7 @@ kube_proxy_mode: ipvs
 kube_proxy_strict_arp: true
 kube_config_dir: /etc/kubernetes
 bin_dir: /usr/local/bin
+kube_kubeadm_apiserver_extra_args:                                          
+  service-account-issuer: api
+  service-account-signing-key-file: /etc/kubernetes/ssl/sa.key
+  api-audiences: api
