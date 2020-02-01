@@ -182,7 +182,7 @@ jobs:
   - put: argocd-deploy
     resource: k8s-components
     params:
-      kubectl: apply -f terraform-kube/k8s-manifests/argocd/namespace.yaml -f https://raw.githubusercontent.com/argoproj/argo-cd/v1.3.6/manifests/ha/install.yaml -n argocd
+      kubectl: apply -f terraform-kube/k8s-manifests/argocd/namespace.yaml -f https://raw.githubusercontent.com/argoproj/argo-cd/v1.4.2/manifests/ha/install.yaml -n argocd
       wait_until_ready_selector: app.kubernetes.io/name=argocd-server
       kubeconfig_file: kubeconfig/kubeconfig.yaml
   - task: argocd-generate-password
@@ -230,6 +230,12 @@ jobs:
     resource: k8s-components
     params:
       kubectl: | 
-        patch deployment/argocd-server -n argocd -p '{"op":"add","path":"/spec/template/spec/containers/0/command/1","value":"--insecure"}'
+        patch deployment/argocd-server -n argocd --type='json' -p '[{"op":"add","path":"/spec/template/spec/containers/0/command/1","value":"--insecure"}]'
       wait_until_ready_selector: app.kubernetes.io/name=argocd-server
       kubeconfig_file: kubeconfig/kubeconfig.yaml
+  - put: argocd-restart
+    resource: k8s-components
+    params:
+      kubectl: delete pods -n argocd -l app.kubernetes.io/name=argocd-server
+      wait_until_ready_selector: app.kubernetes.io/name=argocd-server
+      kubeconfig_file: kubeconfig/kubeconfig.yaml 
