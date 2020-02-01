@@ -7,7 +7,12 @@ variable "provider_server_image" {
   default = "ubuntu-18.04"
 }
 
-variable "provider_server_type" {
+variable "provider_server_master_type" {
+  type    = string
+  default = "cx11"
+}
+
+variable "provider_server_worker_type" {
   type    = string
   default = "cx21"
 }
