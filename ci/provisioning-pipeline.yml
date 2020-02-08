@@ -34,6 +34,8 @@ resources:
       region: eu-central-1
       access_key: ((terraform-backend-access-key))
       secret_key: ((terraform-backend-secret-key))
+    env:
+      ARM_PROVIDER_TWOPOINTZERO_RESOURCES: "True"
 
 - name: kubeconfig
   icon: database
@@ -47,7 +49,7 @@ resources:
     secret_access_key: ((terraform-backend-secret-key))
 
 - name: k8s-components
-  type: kubernetes
+  type: kubernetes    
 
 - name: terraform-kube
   type: git
@@ -112,19 +114,22 @@ jobs:
               cat terraform-state/metadata | jq .kubespray_cluster_vars --raw-output > inventory/group_vars/k8s-cluster/k8s-cluster.yml
               cat terraform-state/metadata | jq .kubespray_addons_vars --raw-output > inventory/group_vars/k8s-cluster/addons.yml
               cat terraform-state/metadata | jq .ssh_private_key --raw-output > inventory/ssh.key
-              cat terraform-state/metadata | jq .master_nodes[0].public_ip --raw-output > inventory/k8s-master-1-ip.ini
+              cat terraform-state/metadata | jq .master_nodes[0].public_ip --raw-output > inventory/k8s-master-1.ini
+              cat terraform-state/metadata | jq .admin_user --raw-output >> inventory/k8s-master-1.ini
               chmod 600 inventory/ssh.key
         outputs:
         - name: inventory
     - put: kubespray-deploy-cluster
       resource: ansible-playbook
       params:
+        become: true
         inventory: inventory/hosts.ini
         playbook: kubespray/cluster.yml
         path: /
     - put: kubespray-deploy-load-balancer
       resource: ansible-playbook
       params:
+        become: true
         inventory: inventory/hosts.ini
         playbook: kubespray/contrib/metallb/metallb.yml
         path: /
@@ -145,9 +150,11 @@ jobs:
           args:
           - -c
           - |
-              K8S_MASTER_1_PUBLIC_IP=$(sed -n 1p inventory/k8s-master-1-ip.ini)
-              ssh -i inventory/ssh.key -o "StrictHostKeyChecking=no" root@$K8S_MASTER_1_PUBLIC_IP 'cat /etc/kubernetes/admin.conf' > k8s-conf/admin.conf
+              K8S_MASTER_1_PUBLIC_IP=$(sed -n 1p inventory/k8s-master-1.ini)
+              K8S_MASTER_1_ADMIN_USER=$(sed -n 2p inventory/k8s-master-1.ini)
+              ssh -i inventory/ssh.key -o "StrictHostKeyChecking=no" $K8S_MASTER_1_ADMIN_USER@$K8S_MASTER_1_PUBLIC_IP 'sudo cat /etc/kubernetes/admin.conf' > k8s-conf/admin.conf
               sed -i "s/https.*6443/https:\/\/$K8S_MASTER_1_PUBLIC_IP:6443/g" k8s-conf/admin.conf
+              sed -i '$!N;s/certificate-authority-data.*server/insecure-skip-tls-verify: true\n    server/g;P;D' k8s-conf/admin.conf
     - put: kubeconfig
       params:
         file: k8s-conf/admin.conf

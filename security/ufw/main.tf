@@ -13,6 +13,7 @@ resource "null_resource" "firewall" {
   connection {
     host        = element(var.hosts, count.index)
     private_key = var.ssh_private_key
+    user     = var.admin_user
   }
 
   provisioner "remote-exec" {

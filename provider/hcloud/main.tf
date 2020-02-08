@@ -1,6 +1,6 @@
 provider "hcloud" {
   version = "~> 1.15"
-  token   = var.provider_token
+  token   = var.provider_client_secret
 }
 
 resource "tls_private_key" "access_key" {

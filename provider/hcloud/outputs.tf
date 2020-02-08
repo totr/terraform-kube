@@ -1,6 +1,9 @@
 output "public_ips" {
   value = hcloud_server.host[*].ipv4_address
 }
+output "admin_user" {
+  value = var.provider_admin_user
+}
 
 output "private_ips" {
   value = hcloud_server_network.srvethn[*].ip
@@ -16,10 +19,6 @@ output "private_network_interface" {
 
 output "ssh_private_key" {
   value = tls_private_key.access_key.private_key_pem
-}
-
-output "floating_ip_id" {
-  value = hcloud_floating_ip.master.id
 }
 
 output "floating_ip" {

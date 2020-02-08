@@ -17,6 +17,35 @@ provider_storage_token =
 | provider_token  | Cloud access token (https://console.hetzner.cloud/projects/<PROJECT_ID>/access/tokens)  | 
 | provider_storage_token  | Access token for Hetzner Cloud Volumes  | 
 
+## Azure
+
+Create a subcription in Azure Cloud. 
+
+Create a Service Principal (https://www.terraform.io/docs/providers/azurerm/guides/service_principal_client_secret.html) - requires Azure CLI
+
+```
+az login
+
+az account list
+
+az account set --subscription="<SUBSCRIPTION_ID>"
+
+az ad sp create-for-rbac --role="Contributor" --scopes="/subscriptions/<SUBSCRIPTION_ID>"
+```
+
+Create a local file with the name <PROJECT_ID>.tfvars in *environments* folder and fill in the following parameter:
+
+```
+provider_token =
+provider_storage_token = 
+```
+
+
+| Name  | Description  | 
+|---|---|
+| provider_token  | Cloud access token (https://console.hetzner.cloud/projects/<PROJECT_ID>/access/tokens)  | 
+| provider_storage_token  | Access token for Hetzner Cloud Volumes  | 
+
 ## Wasabi S3 Storage for Terraform state
 
 * Create Bucket with name *terraform-state* in *eu-central-1* region, [see](https://wasabi.com/wp-content/themes/wasabi/docs/User_Guide/topics/Creating_a_Bucket.htm)
@@ -73,7 +102,7 @@ git-crypt-key:
 Start CI server 
 
 ```bash
-./ci.sh up
+./ci.sh up <environment_name>
 ```
 
 Stop CI server 

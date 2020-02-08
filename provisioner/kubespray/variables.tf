@@ -14,6 +14,10 @@ variable "worker_nodes" {
   }))
 }
 
+variable "admin_user" {
+	type = string
+}
+
 variable "vpn_ips" {
   type = map
 }

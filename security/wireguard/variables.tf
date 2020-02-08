@@ -10,10 +10,13 @@ variable "hostnames" {
   type = list(string)
 }
 
-variable "ssh_private_key" {
+variable "admin_user" {
 	type = string
 }
 
+variable "ssh_private_key" {
+	type = string
+}
 
 variable "private_ips" {
   type = list

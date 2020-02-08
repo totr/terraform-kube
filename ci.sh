@@ -2,6 +2,11 @@
 
 extra_args=""
 if [ "$1" == "up" ]; then
+    if [ -z "$2" ]; then
+    	echo "\nEnvironment name is required, run with the arguments: '$1 <environment_name>' \n"
+    	exit 1
+	fi
+	export ENVIRONMENT_NAME=$2
 	extra_args="-d --force-recreate"
 fi
 

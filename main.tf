@@ -21,16 +21,29 @@ provider "tls" {
 module "provider" {
   source = "./provider/hcloud"
 
-  provider_token     = var.provider_token
-  master_nodes_count = var.master_nodes_count
-  worker_nodes_count = var.worker_nodes_count
+  provider_client_secret = var.provider_client_secret
+  master_nodes_count     = var.master_nodes_count
+  worker_nodes_count     = var.worker_nodes_count
 }
+
+#module "provider" {
+#  source = "./provider/azure"
+#
+#  provider_subscription_id   = var.azure_provider_subscription_id
+#  provider_tenant_id         = var.azure_provider_tenant_id
+#  provider_client_id         = var.azure_provider_client_id
+#  provider_client_secret     = var.provider_client_secret
+#  project_name               = var.project_name
+#  master_nodes_count         = var.master_nodes_count
+#  worker_nodes_count         = var.worker_nodes_count
+#}
 
 module "vpn" {
   source = "./security/wireguard"
 
   server_count    = var.master_nodes_count + var.worker_nodes_count
   hosts           = module.provider.public_ips
+  admin_user      = module.provider.admin_user
   ssh_private_key = module.provider.ssh_private_key
   private_ips     = module.provider.private_ips
   hostnames       = module.provider.hostnames
@@ -42,6 +55,7 @@ module "firewall" {
 
   server_count           = var.master_nodes_count + var.worker_nodes_count
   hosts                  = module.provider.public_ips
+  admin_user             = module.provider.admin_user
   ssh_private_key        = module.provider.ssh_private_key
   private_interface      = module.provider.private_network_interface
   vpn_interface          = module.vpn.vpn_interface
@@ -63,6 +77,7 @@ module "provisioner" {
 
   master_nodes           = module.provider.master_nodes
   worker_nodes           = module.provider.worker_nodes
+  admin_user             = module.provider.admin_user
   vpn_ips                = module.vpn.vpn_ips
   floating_ip            = module.provider.floating_ip
   kube_network_plugin    = var.kube_network_plugin

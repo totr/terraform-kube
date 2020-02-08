@@ -22,6 +22,8 @@ resources:
       region: eu-central-1
       access_key: ((terraform-backend-access-key))
       secret_key: ((terraform-backend-secret-key))
+    env:
+      ARM_PROVIDER_TWOPOINTZERO_RESOURCES: "True"
 
 - name: terraform-kube
   type: git

@@ -1,4 +1,23 @@
-variable "provider_token" {
+variable "azure_provider_subscription_id" {
+  type = string
+  default = "" 
+}
+
+variable "azure_provider_tenant_id" {
+  type = string
+  default = "" 
+}
+
+variable "azure_provider_client_id" {
+  type = string
+  default = "" 
+}
+
+variable "provider_client_secret" {
+  type = string
+}
+
+variable "project_name" {
   type = string
 }
 

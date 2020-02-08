@@ -19,9 +19,10 @@ locals {
   ]
   
   inventory = templatefile("${path.module}/templates/hosts.ini", {
-    all_nodes    = concat(local.masters, local.workers)
-    master_nodes = local.masters
-    worker_nodes = local.workers
+    all_nodes     = concat(local.masters, local.workers)
+    master_nodes  = local.masters
+    worker_nodes  = local.workers
+    admin_user    = var.admin_user
   })
 
   cluster_vars = templatefile("${path.module}/templates/k8s-cluster.yaml", {

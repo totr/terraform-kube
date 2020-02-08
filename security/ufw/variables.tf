@@ -5,6 +5,10 @@ variable "hosts" {
   type = list(string)
 }
 
+variable "admin_user" {
+	type = string
+}
+
 variable "ssh_private_key" {
 	type = string
 }

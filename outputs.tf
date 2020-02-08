@@ -2,6 +2,10 @@ output "ssh_private_key" {
   value = module.provider.ssh_private_key
 }
 
+output "admin_user" {
+  value = module.provider.admin_user
+}
+
 output "master_nodes" {
   value = module.provider.master_nodes
 }
