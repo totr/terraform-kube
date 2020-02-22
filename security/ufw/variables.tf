@@ -6,11 +6,11 @@ variable "hosts" {
 }
 
 variable "admin_user" {
-	type = string
+  type = string
 }
 
 variable "ssh_private_key" {
-	type = string
+  type = string
 }
 
 variable "private_interface" {

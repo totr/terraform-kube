@@ -3,7 +3,7 @@ variable "provider_client_secret" {
 }
 
 variable "provider_admin_user" {
-  type = string
+  type    = string
   default = "root"
 }
 

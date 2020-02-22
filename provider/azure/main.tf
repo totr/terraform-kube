@@ -12,19 +12,19 @@ resource "tls_private_key" "access_key" {
 }
 
 resource "azurerm_resource_group" "default" {
-  name     = format("%s-%s",var.project_name,"resources")
+  name     = format("%s-%s", var.project_name, "resources")
   location = var.provider_network_zone
 }
 
 resource "azurerm_availability_set" "default" {
-  name                = format("%s-%s",var.project_name,"availability-set")
+  name                = format("%s-%s", var.project_name, "availability-set")
   location            = azurerm_resource_group.default.location
   resource_group_name = azurerm_resource_group.default.name
   managed             = true
 }
 
 resource "azurerm_virtual_network" "default" {
-  name                = format("%s-%s",var.project_name,"network")
+  name                = format("%s-%s", var.project_name, "network")
   resource_group_name = azurerm_resource_group.default.name
   location            = azurerm_resource_group.default.location
   address_space       = [var.provider_private_network_ip_range]
@@ -38,29 +38,29 @@ resource "azurerm_subnet" "internal" {
 }
 
 resource "azurerm_public_ip" "vm_ip" {
-  count                = var.master_nodes_count + var.worker_nodes_count
-  name                 = format("%s-%s",format(var.provider_hostname_format, count.index < var.master_nodes_count ? "master" : "worker", count.index + 1),"pip")
-  location             = azurerm_resource_group.default.location
-  resource_group_name  = azurerm_resource_group.default.name
-  allocation_method    = "Dynamic"
+  count               = var.master_nodes_count + var.worker_nodes_count
+  name                = format("%s-%s", format(var.provider_hostname_format, count.index < var.master_nodes_count ? "master" : "worker", count.index + 1), "pip")
+  location            = azurerm_resource_group.default.location
+  resource_group_name = azurerm_resource_group.default.name
+  allocation_method   = "Dynamic"
 }
 
 resource "azurerm_network_interface" "default" {
-  count                      = var.master_nodes_count + var.worker_nodes_count
-  name                       = format("%s-%s",format(var.provider_hostname_format, count.index < var.master_nodes_count ? "master" : "worker", count.index + 1),"nic")
-  location                   = azurerm_resource_group.default.location
-  resource_group_name        = azurerm_resource_group.default.name
+  count               = var.master_nodes_count + var.worker_nodes_count
+  name                = format("%s-%s", format(var.provider_hostname_format, count.index < var.master_nodes_count ? "master" : "worker", count.index + 1), "nic")
+  location            = azurerm_resource_group.default.location
+  resource_group_name = azurerm_resource_group.default.name
 
   ip_configuration {
     name                          = "primary"
     subnet_id                     = azurerm_subnet.internal.id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = element(azurerm_public_ip.vm_ip[*].id,count.index)
+    public_ip_address_id          = element(azurerm_public_ip.vm_ip[*].id, count.index)
   }
 }
 
 resource "azurerm_network_security_group" "default" {
-  name                = format("%s-%s",var.project_name,"nsg")
+  name                = format("%s-%s", var.project_name, "nsg")
   resource_group_name = azurerm_resource_group.default.name
   location            = azurerm_resource_group.default.location
 
@@ -77,7 +77,7 @@ resource "azurerm_network_security_group" "default" {
     direction                  = "Inbound"
   }
 
-   security_rule {
+  security_rule {
     name                       = "AllowHTTPSInBound"
     description                = "Allows inbound internet traffic to HTTPS port"
     protocol                   = "Tcp"
@@ -98,7 +98,7 @@ resource "azurerm_linux_virtual_machine" "host" {
   location              = azurerm_resource_group.default.location
   size                  = count.index < var.master_nodes_count ? var.provider_server_master_type : var.provider_server_worker_type
   admin_username        = var.provider_admin_user
-  network_interface_ids = [element(azurerm_network_interface.default[*].id,count.index)]
+  network_interface_ids = [element(azurerm_network_interface.default[*].id, count.index)]
   tags                  = map("server_type", count.index < var.master_nodes_count ? "master" : "worker")
   availability_set_id   = azurerm_availability_set.default.id
 
@@ -122,14 +122,14 @@ resource "azurerm_linux_virtual_machine" "host" {
 }
 
 resource "azurerm_public_ip" "balancer_ip" {
-  name                = format("%s-%s",var.project_name,"public-ip")
+  name                = format("%s-%s", var.project_name, "public-ip")
   location            = var.provider_network_zone
   resource_group_name = azurerm_resource_group.default.name
   allocation_method   = "Static"
 }
 
 resource "azurerm_lb" "public" {
-  name                = format("%s-%s",var.project_name,"balancer")
+  name                = format("%s-%s", var.project_name, "balancer")
   location            = var.provider_network_zone
   resource_group_name = azurerm_resource_group.default.name
 
@@ -140,7 +140,7 @@ resource "azurerm_lb" "public" {
 }
 
 resource "azurerm_lb_backend_address_pool" "default" {
-  name                = format("%s-%s",var.project_name,"address-pool")
+  name                = format("%s-%s", var.project_name, "address-pool")
   resource_group_name = azurerm_resource_group.default.name
   loadbalancer_id     = azurerm_lb.public.id
 }

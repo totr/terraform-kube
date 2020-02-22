@@ -15,7 +15,7 @@ variable "worker_nodes" {
 }
 
 variable "admin_user" {
-	type = string
+  type = string
 }
 
 variable "vpn_ips" {
@@ -23,7 +23,7 @@ variable "vpn_ips" {
 }
 
 variable "floating_ip" {
-   type = string
+  type = string
 }
 
 variable "kube_network_plugin" {

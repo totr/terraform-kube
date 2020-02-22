@@ -9,7 +9,7 @@ resource "tls_private_key" "access_key" {
 }
 
 resource "hcloud_ssh_key" "terraform-key" {
-  name = "terraform-key"
+  name       = "terraform-key"
   public_key = tls_private_key.access_key.public_key_openssh
 }
 
@@ -55,13 +55,13 @@ resource "hcloud_server_network" "srvethn" {
 }
 
 resource "hcloud_floating_ip" "master" {
-  type = "ipv4"
+  type          = "ipv4"
   home_location = var.provider_floating_ip_location
 }
 
 resource "hcloud_floating_ip_assignment" "main" {
   floating_ip_id = hcloud_floating_ip.master.id
-  server_id = element(hcloud_server.host[*].id, 0)
+  server_id      = element(hcloud_server.host[*].id, 0)
 }
 
 resource "null_resource" "host_floating_ip" {

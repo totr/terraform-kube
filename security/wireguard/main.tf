@@ -8,7 +8,7 @@ resource "null_resource" "wireguard" {
   connection {
     host        = element(var.hosts, count.index)
     private_key = var.ssh_private_key
-    user     = var.admin_user
+    user        = var.admin_user
   }
 
   provisioner "remote-exec" {
