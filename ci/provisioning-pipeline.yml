@@ -74,7 +74,7 @@ resources:
   icon: github-circle
   source:
     uri: https://github.com/kubernetes-sigs/kubespray.git
-    tag_filter: v2.12.0
+    tag_filter: v2.12.1
 
 jobs:
 - name: create-servers
