@@ -165,6 +165,12 @@ jobs:
   - get: kubeconfig
     trigger: true
     passed: [deploy-k8s-cluster]
+  - put: sealed-secrets-deploy
+    resource: k8s-components
+    params:
+      kubectl: apply -f https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.9.7/controller.yaml
+      wait_until_ready_selector: name=sealed-secrets-controller
+      kubeconfig_file: kubeconfig/kubeconfig.yaml
   - put: argocd-deploy
     resource: k8s-components
     params:
@@ -187,11 +193,9 @@ jobs:
         - -c
         - |
             htpasswd -bnBC 10 "" $(cat terraform-kube/environments/((env-name)).tfvars | grep k8s_argocd_admin_pass | cut -d'=' -f2 | tr -d \") | tr -d ':\n' > argocd-config/argocd-admin-pass.ini
-            export ARGOCD_GIT_REPOSITORY_URL=$(cat terraform-kube/environments/((env-name)).tfvars | grep k8s_infra_apps_repo_url | cut -d'=' -f2 | tr -d \ | xargs echo -n")
-            export ARGOCD_GIT_REPOSITORY_REVISION=$(cat terraform-kube/environments/((env-name)).tfvars | grep k8s_infra_apps_repo_revision | cut -d'=' -f2 | tr -d \ | xargs echo -n")
-            cat terraform-kube/k8s-manifests/argocd/configmap.yaml | sed "s|{GIT_REPOSITORY_URL}|$(ARGOCD_GIT_REPOSITORY_URL)|g" > argocd-config/configmap.yaml
-            cat terraform-kube/k8s-manifests/argocd/default-infra-apps.yaml | sed "s|{GIT_REPOSITORY_URL}|$(ARGOCD_GIT_REPOSITORY_URL)|g" > argocd-config/default-infra-apps.yaml
-            cat argocd-config/default-infra-apps.yaml | sed "s|{GIT_REPOSITORY_REVISION}|$(ARGOCD_GIT_REPOSITORY_REVISION)|g" > argocd-config/default-infra-apps.yaml
+            cat terraform-kube/k8s-manifests/argocd/configmap.yaml | sed "s|{GIT_REPOSITORY_URL}|$(cat terraform-kube/environments/((env-name)).tfvars | grep k8s_infra_apps_repo_url | cut -d'=' -f2 | tr -d \ | xargs echo -n)|g" > argocd-config/configmap.yaml
+            cat terraform-kube/k8s-manifests/argocd/default-infra-apps.yaml | sed "s|{GIT_REPOSITORY_URL}|$(cat terraform-kube/environments/((env-name)).tfvars | grep k8s_infra_apps_repo_url | cut -d'=' -f2 | tr -d \ | xargs echo -n)|g" > argocd-config/default-infra-apps.yaml
+            cat argocd-config/default-infra-apps.yaml | sed "s|{GIT_REPOSITORY_REVISION}|$(cat terraform-kube/environments/((env-name)).tfvars | grep k8s_infra_apps_repo_revision | cut -d'=' -f2 | tr -d \ | xargs echo -n)|g" > argocd-config/default-infra-apps.yaml
       outputs:
         - name: argocd-config
   - put: argocd-configure-auth
