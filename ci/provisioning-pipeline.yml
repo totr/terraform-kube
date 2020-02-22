@@ -165,34 +165,13 @@ jobs:
   - get: kubeconfig
     trigger: true
     passed: [deploy-k8s-cluster]
-  - put: storage-driver-create-config
-    resource: k8s-components
-    params:
-      kubectl: create -n kube-system secret generic hcloud-csi --from-literal=token=$(cat terraform-kube/environments/((env-name)).tfvars | grep provider_storage_token | cut -d'=' -f2 | tr -d \" | xargs)
-      kubeconfig_file: kubeconfig/kubeconfig.yaml
-  - put: storage-driver-deploy
-    resource: k8s-components
-    params:
-      kubectl: apply -n kube-system -f https://raw.githubusercontent.com/hetznercloud/csi-driver/v1.2.2/deploy/kubernetes/hcloud-csi.yml
-      wait_until_ready_selector: app=hcloud-csi
-      kubeconfig_file: kubeconfig/kubeconfig.yaml
-  - put: istio-create-namespace
-    resource: k8s-components
-    params:
-      kubectl: create ns istio-system
-      kubeconfig_file: kubeconfig/kubeconfig.yaml
-  - put: dns-provider-create-config
-    resource: k8s-components
-    params:
-      kubectl: create -n istio-system secret generic dns-api-key-secret --from-literal=api-key=$(cat terraform-kube/environments/((env-name)).tfvars | grep dns_api_token | cut -d'=' -f2 | tr -d \" | xargs)
-      kubeconfig_file: kubeconfig/kubeconfig.yaml
   - put: argocd-deploy
     resource: k8s-components
     params:
       kubectl: apply -f terraform-kube/k8s-manifests/argocd/namespace.yaml -f https://raw.githubusercontent.com/argoproj/argo-cd/v1.4.2/manifests/ha/install.yaml -n argocd
       wait_until_ready_selector: app.kubernetes.io/name=argocd-server
       kubeconfig_file: kubeconfig/kubeconfig.yaml
-  - task: argocd-generate-password
+  - task: argocd-generate-config
     config:
       image_resource:
         type: docker-image
@@ -208,6 +187,11 @@ jobs:
         - -c
         - |
             htpasswd -bnBC 10 "" $(cat terraform-kube/environments/((env-name)).tfvars | grep k8s_argocd_admin_pass | cut -d'=' -f2 | tr -d \") | tr -d ':\n' > argocd-config/argocd-admin-pass.ini
+            export ARGOCD_GIT_REPOSITORY_URL=$(cat terraform-kube/environments/((env-name)).tfvars | grep k8s_infra_apps_repo_url | cut -d'=' -f2 | tr -d \ | xargs echo -n")
+            export ARGOCD_GIT_REPOSITORY_REVISION=$(cat terraform-kube/environments/((env-name)).tfvars | grep k8s_infra_apps_repo_revision | cut -d'=' -f2 | tr -d \ | xargs echo -n")
+            cat terraform-kube/k8s-manifests/argocd/configmap.yaml | sed "s|{GIT_REPOSITORY_URL}|$(ARGOCD_GIT_REPOSITORY_URL)|g" > argocd-config/configmap.yaml
+            cat terraform-kube/k8s-manifests/argocd/default-infra-apps.yaml | sed "s|{GIT_REPOSITORY_URL}|$(ARGOCD_GIT_REPOSITORY_URL)|g" > argocd-config/default-infra-apps.yaml
+            cat argocd-config/default-infra-apps.yaml | sed "s|{GIT_REPOSITORY_REVISION}|$(ARGOCD_GIT_REPOSITORY_REVISION)|g" > argocd-config/default-infra-apps.yaml
       outputs:
         - name: argocd-config
   - put: argocd-configure-auth
@@ -226,12 +210,12 @@ jobs:
     resource: k8s-components
     params:
       kubectl: | 
-        apply -n argocd -f terraform-kube/k8s-manifests/argocd/configmap.yaml
+        apply -n argocd -f argocd-config/configmap.yaml
       kubeconfig_file: kubeconfig/kubeconfig.yaml
   - put: argocd-register-default-infra-apps
     resource: k8s-components
     params:
-      kubectl: apply -n argocd -f terraform-kube/k8s-manifests/argocd/default-infra-apps.yaml
+      kubectl: apply -n argocd -f argocd-config/default-infra-apps.yaml
       kubeconfig_file: kubeconfig/kubeconfig.yaml
   - put: argocd-patch-deployment
     resource: k8s-components

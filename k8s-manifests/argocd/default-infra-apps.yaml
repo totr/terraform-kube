@@ -12,12 +12,8 @@ spec:
   project: default
   source:
     path: apps
-    repoURL: https://github.com/totr/argocd-infra-apps.git
-    targetRevision: HEAD
+    repoURL: {GIT_REPOSITORY_URL}
+    targetRevision: {GIT_REPOSITORY_REVISION}
     helm:
       valueFiles:
         - values.yaml
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true

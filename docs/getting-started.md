@@ -8,14 +8,12 @@ Create a local file with the name <PROJECT_ID>.tfvars in *environments* folder a
 
 ```
 provider_token =
-provider_storage_token = 
 ```
 
 
 | Name  | Description  | 
 |---|---|
 | provider_token  | Cloud access token (https://console.hetzner.cloud/projects/<PROJECT_ID>/access/tokens)  | 
-| provider_storage_token  | Access token for Hetzner Cloud Volumes  | 
 
 ## Azure
 
@@ -37,14 +35,12 @@ Create a local file with the name <PROJECT_ID>.tfvars in *environments* folder a
 
 ```
 provider_token =
-provider_storage_token = 
 ```
 
 
 | Name  | Description  | 
 |---|---|
 | provider_token  | Cloud access token (https://console.hetzner.cloud/projects/<PROJECT_ID>/access/tokens)  | 
-| provider_storage_token  | Access token for Hetzner Cloud Volumes  | 
 
 ## Wasabi S3 Storage for Terraform state
 

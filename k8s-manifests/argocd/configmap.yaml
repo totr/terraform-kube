@@ -9,5 +9,5 @@ metadata:
 data:
   repositories: |
     - type: git
-      url: https://github.com/totr/argocd-infra-apps.git
+      url: {GIT_REPOSITORY_URL}
       name: infra-apps
