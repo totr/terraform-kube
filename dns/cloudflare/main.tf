@@ -1,5 +1,6 @@
 locals {
   zone_id = lookup(data.cloudflare_zones.domain_zones.zones[0], "id")
+  subdomains = reverse(split(".", var.domain))
 }
 
 provider "cloudflare" {
@@ -10,7 +11,7 @@ provider "cloudflare" {
 
 data "cloudflare_zones" "domain_zones" {
   filter {
-    name   = var.domain
+    name   = format("%s.%s", local.subdomains[1], local.subdomains[0])
     status = "active"
     paused = false
   }
@@ -28,7 +29,7 @@ resource "cloudflare_record" "wildcard" {
   depends_on = [cloudflare_record.domain]
 
   zone_id = local.zone_id
-  name    = "*"
+  name    = format("%s.%s", "*", var.domain)
   value   = var.domain
   type    = "CNAME"
   proxied = false
