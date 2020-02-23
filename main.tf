@@ -21,9 +21,11 @@ provider "tls" {
 module "provider" {
   source = "./provider/hcloud"
 
-  provider_client_secret = var.provider_client_secret
-  master_nodes_count     = var.master_nodes_count
-  worker_nodes_count     = var.worker_nodes_count
+  provider_client_secret      = var.provider_client_secret
+  provider_server_master_type = var.provider_server_master_type
+  provider_server_worker_type = var.provider_server_worker_type
+  master_nodes_count          = var.master_nodes_count
+  worker_nodes_count          = var.worker_nodes_count
 }
 
 #module "provider" {
@@ -33,6 +35,8 @@ module "provider" {
 #  provider_tenant_id         = var.azure_provider_tenant_id
 #  provider_client_id         = var.azure_provider_client_id
 #  provider_client_secret     = var.provider_client_secret
+#  provider_server_master_type = var.provider_server_master_type
+#  provider_server_worker_type = var.provider_server_worker_type
 #  project_name               = var.project_name
 #  master_nodes_count         = var.master_nodes_count
 #  worker_nodes_count         = var.worker_nodes_count

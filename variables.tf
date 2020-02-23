@@ -17,6 +17,14 @@ variable "provider_client_secret" {
   type = string
 }
 
+variable provider_server_master_type {
+  type = string
+}
+
+variable provider_server_worker_type {
+  type = string
+}
+
 variable "project_name" {
   type = string
 }
