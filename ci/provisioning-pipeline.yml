@@ -29,7 +29,7 @@ resources:
       endpoint: "https://s3.eu-central-1.wasabisys.com"
       skip_credentials_validation: true
       skip_metadata_api_check: true
-      bucket: terraform-kube
+      bucket: ((terraform-backend-bucket))
       key: terraform.tfstate
       region: eu-central-1
       access_key: ((terraform-backend-access-key))
@@ -43,7 +43,7 @@ resources:
   source:
     endpoint: "https://s3.eu-central-1.wasabisys.com"
     region_name: eu-central-1
-    bucket: terraform-kube
+    bucket: ((terraform-backend-bucket))
     versioned_file: env:/((env-name))/kubeconfig.yaml
     access_key_id: ((terraform-backend-access-key))
     secret_access_key: ((terraform-backend-secret-key))
@@ -65,6 +65,7 @@ resources:
     uri: ((env-git-repo-uri))
     tag_filter: ((env-git-repo-tag))
     git_crypt_key: ((terraform-environments-git-crypt-key))
+    private_key: ((terraform-environments-git-private-key))
 
 - name: ansible-playbook
   type: ansible

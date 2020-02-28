@@ -84,15 +84,19 @@ k8s_argocd_admin_pass =
 Add the following parameters to the file *credentials.yaml* in *ci* folder.
 
 ```
+terraform-backend-bucket:
 terraform-backend-access-key:
 terraform-backend-secret-key:
+terraform-environments-git-private-key:
 terraform-environments-git-crypt-key: 
 ```
 
 | Name  | Description  | 
 |---|---|
+| terraform-backend-bucket  | Wasabi S3 bucket name  | 
 | terraform-backend-access-key  | Wasabi S3 access key  | 
 | terraform-backend-secret-key  | Wasabi S3 secret key  | 
+| terraform-environments-git-private-key  | Git repo private key | 
 | terraform-environments-git-crypt-key  | git-crypt export-key -- - `|` base64 | 
 
 Start CI server 
