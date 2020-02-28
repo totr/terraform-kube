@@ -86,14 +86,14 @@ Add the following parameters to the file *credentials.yaml* in *ci* folder.
 ```
 terraform-backend-access-key:
 terraform-backend-secret-key:
-git-crypt-key: 
+terraform-environments-git-crypt-key: 
 ```
 
 | Name  | Description  | 
 |---|---|
 | terraform-backend-access-key  | Wasabi S3 access key  | 
 | terraform-backend-secret-key  | Wasabi S3 secret key  | 
-| git-crypt-key  | git-crypt export-key -- - `|` base64 | 
+| terraform-environments-git-crypt-key  | git-crypt export-key -- - `|` base64 | 
 
 Start CI server 
 

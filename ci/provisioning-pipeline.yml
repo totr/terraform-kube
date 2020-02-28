@@ -57,7 +57,14 @@ resources:
   source:
     uri: https://github.com/totr/terraform-kube
     branch: master
-    git_crypt_key: ((git-crypt-key))
+
+- name: terraform-environments
+  type: git
+  icon: github-circle
+  source:
+    uri: ((env-git-repo-uri))
+    tag_filter: ((env-git-repo-tag))
+    git_crypt_key: ((terraform-environments-git-crypt-key))
 
 - name: ansible-playbook
   type: ansible
@@ -80,11 +87,12 @@ jobs:
 - name: create-servers
   plan:
     - get: terraform-kube
+    - get: terraform-environments
       trigger: true
     - put: terraform-state
       params:
         env_name: ((env-name))
-        var_files: [terraform-kube/environments/((env-name)).tfvars]
+        var_files: [terraform-environments/environments/((env-name)).tfvars]
         terraform_source: terraform-kube
 
 - name: deploy-k8s-cluster
@@ -162,6 +170,7 @@ jobs:
 - name: deploy-k8s-components
   plan:
   - get: terraform-kube
+  - get: terraform-environments
   - get: kubeconfig
     trigger: true
     passed: [deploy-k8s-cluster]
@@ -187,15 +196,16 @@ jobs:
       platform: linux
       inputs:
       - name: terraform-kube
+      - name: terraform-environments
       run:
         path: sh
         args:
         - -c
         - |
-            htpasswd -bnBC 10 "" $(cat terraform-kube/environments/((env-name)).tfvars | grep k8s_argocd_admin_pass | cut -d'=' -f2 | tr -d \") | tr -d ':\n' > argocd-config/argocd-admin-pass.ini
-            cat terraform-kube/k8s-manifests/argocd/configmap.yaml | sed "s|{GIT_REPOSITORY_URL}|$(cat terraform-kube/environments/((env-name)).tfvars | grep k8s_infra_apps_repo_url | cut -d'=' -f2 | tr -d \ | xargs echo -n)|g" > argocd-config/configmap.yaml
-            cat terraform-kube/k8s-manifests/argocd/default-infra-apps.yaml | sed "s|{GIT_REPOSITORY_URL}|$(cat terraform-kube/environments/((env-name)).tfvars | grep k8s_infra_apps_repo_url | cut -d'=' -f2 | tr -d \ | xargs echo -n)|g" > argocd-config/default-infra-apps.yaml
-            cat argocd-config/default-infra-apps.yaml | sed "s|{GIT_REPOSITORY_REVISION}|$(cat terraform-kube/environments/((env-name)).tfvars | grep k8s_infra_apps_repo_revision | cut -d'=' -f2 | tr -d \ | xargs echo -n)|g" > argocd-config/default-infra-apps.yaml
+            htpasswd -bnBC 10 "" $(cat terraform-environments/environments/((env-name)).tfvars | grep k8s_argocd_admin_pass | cut -d'=' -f2 | tr -d \") | tr -d ':\n' > argocd-config/argocd-admin-pass.ini
+            cat terraform-kube/k8s-manifests/argocd/configmap.yaml | sed "s|{GIT_REPOSITORY_URL}|$(cat terraform-environments/environments/((env-name)).tfvars | grep k8s_infra_apps_repo_url | cut -d'=' -f2 | tr -d \ | xargs echo -n)|g" > argocd-config/configmap.yaml
+            cat terraform-kube/k8s-manifests/argocd/default-infra-apps.yaml | sed "s|{GIT_REPOSITORY_URL}|$(cat terraform-environments/environments/((env-name)).tfvars | grep k8s_infra_apps_repo_url | cut -d'=' -f2 | tr -d \ | xargs echo -n)|g" > argocd-config/default-infra-apps.yaml
+            cat argocd-config/default-infra-apps.yaml | sed "s|{GIT_REPOSITORY_REVISION}|$(cat terraform-environments/environments/((env-name)).tfvars | grep k8s_infra_apps_repo_revision | cut -d'=' -f2 | tr -d \ | xargs echo -n)|g" > argocd-config/default-infra-apps.yaml
       outputs:
         - name: argocd-config
   - put: argocd-configure-auth

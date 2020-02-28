@@ -31,16 +31,24 @@ resources:
   source:
     uri: https://github.com/totr/terraform-kube
     branch: master
-    git_crypt_key: ((git-crypt-key))
+
+- name: terraform-environments
+  type: git
+  icon: github-circle
+  source:
+    uri: ((env-git-repo-uri))
+    tag_filter: ((env-git-repo-tag))
+    git_crypt_key: ((terraform-environments-git-crypt-key))
 
 jobs:
 - name: destroy-servers
   plan:
     - get: terraform-kube
+    - get: terraform-environments
     - put: terraform-state
       params:
         env_name: ((env-name))
-        var_files: [terraform-kube/environments/((env-name)).tfvars]
+        var_files: [terraform-environments/environments/((env-name)).tfvars]
         terraform_source: terraform-kube
         action: destroy
       get_params:
