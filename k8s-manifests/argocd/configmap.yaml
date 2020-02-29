@@ -10,4 +10,7 @@ data:
   repositories: |
     - type: git
       url: {GIT_REPOSITORY_URL}
-      name: infra-apps
+      name: system-apps
+      sshPrivateKeySecret:
+        key: sshPrivateKey
+        name: system-apps-ssh-key-secret

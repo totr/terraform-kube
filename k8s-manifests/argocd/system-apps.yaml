@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: infra-apps
+  name: system-apps
   namespace: argocd
   finalizers:
   - resources-finalizer.argocd.argoproj.io
@@ -11,7 +11,7 @@ spec:
     server: https://kubernetes.default.svc
   project: default
   source:
-    path: apps
+    path: {SYSTEM_APPS_SOURCE_PATH}
     repoURL: {GIT_REPOSITORY_URL}
     targetRevision: {GIT_REPOSITORY_REVISION}
     helm:

@@ -204,9 +204,11 @@ jobs:
         - -c
         - |
             htpasswd -bnBC 10 "" $(cat terraform-environments/environments/((env-name)).tfvars | grep k8s_argocd_admin_pass | cut -d'=' -f2 | tr -d \") | tr -d ':\n' > argocd-config/argocd-admin-pass.ini
-            cat terraform-kube/k8s-manifests/argocd/configmap.yaml | sed "s|{GIT_REPOSITORY_URL}|$(cat terraform-environments/environments/((env-name)).tfvars | grep k8s_infra_apps_repo_url | cut -d'=' -f2 | tr -d \ | xargs echo -n)|g" > argocd-config/configmap.yaml
-            cat terraform-kube/k8s-manifests/argocd/default-infra-apps.yaml | sed "s|{GIT_REPOSITORY_URL}|$(cat terraform-environments/environments/((env-name)).tfvars | grep k8s_infra_apps_repo_url | cut -d'=' -f2 | tr -d \ | xargs echo -n)|g" > argocd-config/default-infra-apps.yaml
-            cat argocd-config/default-infra-apps.yaml | sed "s|{GIT_REPOSITORY_REVISION}|$(cat terraform-environments/environments/((env-name)).tfvars | grep k8s_infra_apps_repo_revision | cut -d'=' -f2 | tr -d \ | xargs echo -n)|g" > argocd-config/default-infra-apps.yaml
+            cat terraform-kube/k8s-manifests/argocd/configmap.yaml | sed "s|{GIT_REPOSITORY_URL}|$(cat terraform-environments/environments/((env-name)).tfvars | grep k8s_system_apps_repo_url | cut -d'=' -f2 | tr -d \ | xargs echo -n)|g" > argocd-config/configmap.yaml
+            cat terraform-kube/k8s-manifests/argocd/system-apps.yaml | sed "s|{GIT_REPOSITORY_URL}|$(cat terraform-environments/environments/((env-name)).tfvars | grep k8s_system_apps_repo_url | cut -d'=' -f2 | tr -d \ | xargs echo -n)|g" > argocd-config/system-apps.yaml
+            cat terraform-kube/k8s-manifests/argocd/system-apps-secret.yaml | sed "s|{SSH_PRIVATE_KEY}|$(cat terraform-environments/environments/((env-name)).tfvars | grep k8s_system_apps_repo_private_key | cut -d'=' -f2 | tr -d \ | xargs echo -n)|g" > argocd-config/system-apps-secret.yaml
+            cat argocd-config/system-apps.yaml | sed "s|{GIT_REPOSITORY_REVISION}|$(cat terraform-environments/environments/((env-name)).tfvars | grep k8s_system_apps_repo_revision | cut -d'=' -f2 | tr -d \ | xargs echo -n)|g" > argocd-config/system-apps.yaml
+            cat argocd-config/system-apps.yaml | sed "s|{SYSTEM_APPS_SOURCE_PATH}|$(cat terraform-environments/environments/((env-name)).tfvars | grep k8s_system_apps_source_path | cut -d'=' -f2 | tr -d \ | xargs echo -n)|g" > argocd-config/system-apps.yaml
       outputs:
         - name: argocd-config
   - put: argocd-configure-auth
@@ -227,10 +229,16 @@ jobs:
       kubectl: | 
         apply -n argocd -f argocd-config/configmap.yaml
       kubeconfig_file: kubeconfig/kubeconfig.yaml
-  - put: argocd-register-default-infra-apps
+  - put: argocd-create-system-apps-secret
     resource: k8s-components
     params:
-      kubectl: apply -n argocd -f argocd-config/default-infra-apps.yaml
+      kubectl: | 
+        apply -n argocd -f argocd-config/system-apps-secret.yaml
+      kubeconfig_file: kubeconfig/kubeconfig.yaml
+  - put: argocd-register-system-apps
+    resource: k8s-components
+    params:
+      kubectl: apply -n argocd -f argocd-config/system-apps.yaml
       kubeconfig_file: kubeconfig/kubeconfig.yaml
   - put: argocd-patch-deployment
     resource: k8s-components
