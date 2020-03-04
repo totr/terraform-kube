@@ -353,6 +353,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#azure" class="md-nav__link">
+    Azure
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#wasabi-s3-storage-for-terraform-state" class="md-nav__link">
     Wasabi S3 Storage for Terraform state
   </a>
@@ -460,6 +467,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#azure" class="md-nav__link">
+    Azure
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#wasabi-s3-storage-for-terraform-state" class="md-nav__link">
     Wasabi S3 Storage for Terraform state
   </a>
@@ -511,7 +525,6 @@
 <p>Create a project in Hetzner Cloud environment. </p>
 <p>Create a local file with the name <PROJECT_ID>.tfvars in <em>environments</em> folder and fill in the following parameter:</p>
 <div class="codehilite"><pre><span></span><span class="err">provider_token =</span>
-<span class="err">provider_storage_token = </span>
 </pre></div>
 
 
@@ -527,9 +540,37 @@
 <td>provider_token</td>
 <td>Cloud access token (https://console.hetzner.cloud/projects/<PROJECT_ID>/access/tokens)</td>
 </tr>
+</tbody>
+</table>
+<h2 id="azure">Azure<a class="headerlink" href="#azure" title="Permanent link">&para;</a></h2>
+<p>Create a subcription in Azure Cloud. </p>
+<p>Create a Service Principal (https://www.terraform.io/docs/providers/azurerm/guides/service_principal_client_secret.html) - requires Azure CLI</p>
+<div class="codehilite"><pre><span></span><span class="n">az</span> <span class="n">login</span>
+
+<span class="n">az</span> <span class="n">account</span> <span class="n">list</span>
+
+<span class="n">az</span> <span class="n">account</span> <span class="k">set</span> <span class="c1">--subscription=&quot;&lt;SUBSCRIPTION_ID&gt;&quot;</span>
+
+<span class="n">az</span> <span class="n">ad</span> <span class="n">sp</span> <span class="k">create</span><span class="o">-</span><span class="k">for</span><span class="o">-</span><span class="n">rbac</span> <span class="c1">--role=&quot;Contributor&quot; --scopes=&quot;/subscriptions/&lt;SUBSCRIPTION_ID&gt;&quot;</span>
+</pre></div>
+
+
+<p>Create a local file with the name <PROJECT_ID>.tfvars in <em>environments</em> folder and fill in the following parameter:</p>
+<div class="codehilite"><pre><span></span><span class="err">provider_token =</span>
+</pre></div>
+
+
+<table>
+<thead>
 <tr>
-<td>provider_storage_token</td>
-<td>Access token for Hetzner Cloud Volumes</td>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>provider_token</td>
+<td>Cloud access token (https://console.hetzner.cloud/projects/<PROJECT_ID>/access/tokens)</td>
 </tr>
 </tbody>
 </table>
@@ -602,9 +643,11 @@ Registrars typically process nameserver updates within 24 hours. Once this proce
 </table>
 <h2 id="concourse-ci">Concourse CI<a class="headerlink" href="#concourse-ci" title="Permanent link">&para;</a></h2>
 <p>Add the following parameters to the file <em>credentials.yaml</em> in <em>ci</em> folder.</p>
-<div class="codehilite"><pre><span></span><span class="c">terraform-backend-access-key:</span>
+<div class="codehilite"><pre><span></span><span class="c">terraform-backend-bucket:</span>
+<span class="c">terraform-backend-access-key:</span>
 <span class="c">terraform-backend-secret-key:</span>
-<span class="c">git-crypt-key: </span>
+<span class="c">terraform-environments-git-private-key:</span>
+<span class="c">terraform-environments-git-crypt-key: </span>
 </pre></div>
 
 
@@ -617,6 +660,10 @@ Registrars typically process nameserver updates within 24 hours. Once this proce
 </thead>
 <tbody>
 <tr>
+<td>terraform-backend-bucket</td>
+<td>Wasabi S3 bucket name</td>
+</tr>
+<tr>
 <td>terraform-backend-access-key</td>
 <td>Wasabi S3 access key</td>
 </tr>
@@ -625,13 +672,17 @@ Registrars typically process nameserver updates within 24 hours. Once this proce
 <td>Wasabi S3 secret key</td>
 </tr>
 <tr>
-<td>git-crypt-key</td>
+<td>terraform-environments-git-private-key</td>
+<td>Git repo private key</td>
+</tr>
+<tr>
+<td>terraform-environments-git-crypt-key</td>
 <td>git-crypt export-key -- - <code>|</code> base64</td>
 </tr>
 </tbody>
 </table>
 <p>Start CI server </p>
-<div class="codehilite"><pre><span></span>./ci.sh up
+<div class="codehilite"><pre><span></span>./ci.sh up &lt;environment_name&gt;
 </pre></div>
 
 
