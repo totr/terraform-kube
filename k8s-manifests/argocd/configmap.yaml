@@ -14,3 +14,8 @@ data:
       sshPrivateKeySecret:
         key: sshPrivateKey
         name: system-apps-ssh-key-secret
+  resource.customizations: |
+    admissionregistration.k8s.io/MutatingWebhookConfiguration:
+      ignoreDifferences: |
+        jsonPointers:
+        - /webhooks/0/clientConfig/caBundle
