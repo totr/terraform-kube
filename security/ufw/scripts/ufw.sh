@@ -9,6 +9,7 @@ sudo ufw allow in on ${kube_overlay_interface} # Kubernetes pod overlay interfac
 sudo ufw allow 6443 # Kubernetes API secure remote port
 sudo ufw allow 80
 sudo ufw allow 443
+sudo ufw allow 50000
 sudo ufw default deny incoming
 sudo ufw --force enable
 sudo ufw status verbose
