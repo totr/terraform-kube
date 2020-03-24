@@ -1,5 +1,5 @@
 locals {
-  zone_id = lookup(data.cloudflare_zones.domain_zones.zones[0], "id")
+  zone_id    = lookup(data.cloudflare_zones.domain_zones.zones[0], "id")
   subdomains = reverse(split(".", var.domain))
 }
 

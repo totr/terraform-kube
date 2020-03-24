@@ -41,7 +41,7 @@ variable "provider_storage_account_type" {
 
 variable "provider_hostname_format" {
   type    = string
-  default = "kube-%s-%s"
+  default = "%s-%s-%s"
 }
 
 variable "provider_private_network_ip_range" {

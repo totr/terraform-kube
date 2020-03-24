@@ -93,7 +93,7 @@ resource "azurerm_network_security_group" "default" {
 
 resource "azurerm_linux_virtual_machine" "host" {
   count                 = var.master_nodes_count + var.worker_nodes_count
-  name                  = format(var.provider_hostname_format, count.index < var.master_nodes_count ? "master" : "worker", count.index + 1)
+  name                  = format(var.provider_hostname_format, var.project_name, count.index < var.master_nodes_count ? "master" : "worker", count.index + 1)
   resource_group_name   = azurerm_resource_group.default.name
   location              = azurerm_resource_group.default.location
   size                  = count.index < var.master_nodes_count ? var.provider_server_master_type : var.provider_server_worker_type

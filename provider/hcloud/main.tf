@@ -14,7 +14,7 @@ resource "hcloud_ssh_key" "terraform-key" {
 }
 
 resource "hcloud_server" "host" {
-  name        = format(var.provider_hostname_format, count.index < var.master_nodes_count ? "master" : "worker", count.index + 1)
+  name        = format(var.provider_hostname_format, var.project_name, count.index < var.master_nodes_count ? "master" : "worker", count.index + 1)
   image       = var.provider_server_image
   server_type = count.index < var.master_nodes_count ? var.provider_server_master_type : var.provider_server_worker_type
   count       = var.master_nodes_count + var.worker_nodes_count

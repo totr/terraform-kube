@@ -9,17 +9,17 @@ variable "provider_admin_user" {
 
 variable "provider_server_image" {
   type    = string
-  default = "ubuntu-18.04"
+  default = "ubuntu-18-04-x64"
 }
 
 variable "provider_server_master_type" {
   type    = string
-  default = "cx11"
+  default = "s-2vcpu-2gb"
 }
 
 variable "provider_server_worker_type" {
   type    = string
-  default = "cx21"
+  default = "s-4vcpu-8gb"
 }
 
 variable "provider_hostname_format" {
@@ -37,14 +37,9 @@ variable "provider_private_network_subnet_ip_range" {
   default = "10.0.0.0/24"
 }
 
-variable "provider_network_zone" {
+variable "provider_region" {
   type    = string
-  default = "eu-central"
-}
-
-variable "provider_floating_ip_location" {
-  type    = string
-  default = "nbg1"
+  default = "fra1"
 }
 
 variable "project_name" {
