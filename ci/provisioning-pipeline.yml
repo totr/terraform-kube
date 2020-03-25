@@ -178,7 +178,7 @@ jobs:
   - put: sealed-secrets-deploy
     resource: k8s-components
     params:
-      kubectl: apply -f https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.9.7/controller.yaml
+      kubectl: apply -f https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.11.0/controller.yaml
       wait_until_ready_selector: name=sealed-secrets-controller
       kubeconfig_file: kubeconfig/kubeconfig.yaml
   - put: argocd-deploy
