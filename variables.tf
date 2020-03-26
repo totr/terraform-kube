@@ -88,5 +88,5 @@ variable "lb_forwarding_target_https_port" {
 
 variable "lb_forwarding_target_ssh_port" {
   type    = number
-  default = 22
+  default = 30022
 }
