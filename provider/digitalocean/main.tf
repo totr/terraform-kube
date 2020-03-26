@@ -3,22 +3,14 @@ provider "digitalocean" {
   token   = var.provider_client_secret
 }
 
-resource "digitalocean_project" "main" {
-  name = var.project_name
-}
-
-resource "digitalocean_project_resources" "main" {
-  count   = var.master_nodes_count + var.worker_nodes_count
-  project = digitalocean_project.main.id
-  resources = [
-    digitalocean_floating_ip.master.urn,
-    element(digitalocean_droplet.host[*].urn, count.index)
-  ]
-}
-
 resource "tls_private_key" "access_key" {
   algorithm = "RSA"
   rsa_bits  = 4096
+}
+
+resource "digitalocean_project" "main" {
+  name      = var.project_name
+  resources = concat(list(digitalocean_loadbalancer.public.urn), digitalocean_droplet.host[*].urn)
 }
 
 resource "digitalocean_ssh_key" "terraform-key" {
@@ -26,13 +18,40 @@ resource "digitalocean_ssh_key" "terraform-key" {
   public_key = tls_private_key.access_key.public_key_openssh
 }
 
-resource "digitalocean_floating_ip" "master" {
+resource "digitalocean_loadbalancer" "public" {
+  name   = format("%s-%s", var.project_name, "load-balancer")
   region = var.provider_region
-}
 
-resource "digitalocean_floating_ip_assignment" "main" {
-  ip_address = digitalocean_floating_ip.master.ip_address
-  droplet_id = element(digitalocean_droplet.host[*].id, 0)
+  forwarding_rule {
+    entry_port     = 80
+    entry_protocol = "tcp"
+
+    target_port     = var.lb_forwarding_target_http_port
+    target_protocol = "tcp"
+  }
+
+  forwarding_rule {
+    entry_port     = 443
+    entry_protocol = "tcp"
+
+    target_port     = var.lb_forwarding_target_https_port
+    target_protocol = "tcp"
+  }
+
+  forwarding_rule {
+    entry_port     = 22
+    entry_protocol = "tcp"
+
+    target_port     = var.lb_forwarding_target_ssh_port
+    target_protocol = "tcp"
+  }
+
+  healthcheck {
+    port     = var.lb_forwarding_target_health_port
+    protocol = "tcp"
+  }
+
+  droplet_ids = [for host in digitalocean_droplet.host[*] : host.id if contains(host.tags, "worker")]
 }
 
 resource "digitalocean_droplet" "host" {

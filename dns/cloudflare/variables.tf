@@ -1,4 +1,4 @@
-variable "floating_ip" {
+variable "dns_ip" {
   type = string
 }
 

@@ -135,13 +135,14 @@ jobs:
         inventory: inventory/hosts.ini
         playbook: kubespray/cluster.yml
         path: /
-    - put: kubespray-deploy-load-balancer
-      resource: ansible-playbook
-      params:
-        become: true
-        inventory: inventory/hosts.ini
-        playbook: kubespray/contrib/metallb/metallb.yml
-        path: /
+    # FIXME deploy based on the type of cloud provider    
+    #- put: kubespray-deploy-load-balancer
+    #  resource: ansible-playbook
+    #  params:
+    #    become: true
+    #    inventory: inventory/hosts.ini
+    #    playbook: kubespray/contrib/metallb/metallb.yml
+    #    path: /
     - task: get-kubeconfig
       config:
         platform: linux

@@ -21,7 +21,7 @@ output "ssh_private_key" {
   value = tls_private_key.access_key.private_key_pem
 }
 
-output "floating_ip" {
+output "dns_ip" {
   value = hcloud_floating_ip.master.ip_address
 }
 
@@ -45,4 +45,8 @@ output "worker_nodes" {
     }
     if lookup(i.labels, "server_type") == "worker"
   ])
+}
+
+output "cloud_provider_load_balancer" {
+  value = false
 }

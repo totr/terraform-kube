@@ -14,7 +14,7 @@ output "hostnames" {
   value = azurerm_linux_virtual_machine.host[*].name
 }
 
-output "floating_ip" {
+output "dns_ip" {
   value = azurerm_public_ip.balancer_ip.ip_address
 }
 
@@ -46,4 +46,8 @@ output "worker_nodes" {
     }
     if lookup(i.tags, "server_type") == "worker"
   ])
+}
+
+output "cloud_provider_load_balancer" {
+  value = true
 }

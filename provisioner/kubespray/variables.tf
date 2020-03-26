@@ -22,7 +22,7 @@ variable "vpn_ips" {
   type = map
 }
 
-variable "floating_ip" {
+variable "dns_ip" {
   type = string
 }
 
@@ -36,4 +36,8 @@ variable "kube_service_addresses" {
 
 variable "kube_pods_subnet" {
   type = string
+}
+
+variable "cloud_provider_load_balancer" {
+  type = bool
 }

@@ -53,3 +53,19 @@ variable "master_nodes_count" {
 variable "worker_nodes_count" {
   type = string
 }
+
+variable "lb_forwarding_target_http_port" {
+  type = number
+}
+
+variable "lb_forwarding_target_https_port" {
+  type = number
+}
+
+variable "lb_forwarding_target_health_port" {
+  type = number
+}
+
+variable "lb_forwarding_target_ssh_port" {
+  type = number
+}

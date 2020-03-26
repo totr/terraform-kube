@@ -32,6 +32,7 @@ locals {
   })
 
   addons_vars = templatefile("${path.module}/templates/addons.yaml", {
-    floating_ip = var.floating_ip
+    dns_ip                       = var.dns_ip
+    cloud_provider_load_balancer = var.cloud_provider_load_balancer
   })
 }

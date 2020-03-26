@@ -22,10 +22,6 @@ output "ssh_private_key" {
   value = tls_private_key.access_key.private_key_pem
 }
 
-output "floating_ip" {
-  value = digitalocean_floating_ip.master.ip_address
-}
-
 output "master_nodes" {
   value = flatten([
     for i in digitalocean_droplet.host[*] : {
@@ -46,4 +42,12 @@ output "worker_nodes" {
     }
     if contains(i.tags, "worker") == true
   ])
+}
+
+output "cloud_provider_load_balancer" {
+  value = true
+}
+
+output "dns_ip" {
+  value = digitalocean_loadbalancer.public.ip
 }

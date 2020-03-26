@@ -70,3 +70,23 @@ variable "kube_overlay_interface" {
   type    = string
   default = "weave"
 }
+
+variable "lb_forwarding_target_health_port" {
+  type    = number
+  default = 30010
+}
+
+variable "lb_forwarding_target_http_port" {
+  type    = number
+  default = 30080
+}
+
+variable "lb_forwarding_target_https_port" {
+  type    = number
+  default = 300443
+}
+
+variable "lb_forwarding_target_ssh_port" {
+  type    = number
+  default = 22
+}
