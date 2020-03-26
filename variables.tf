@@ -83,7 +83,7 @@ variable "lb_forwarding_target_http_port" {
 
 variable "lb_forwarding_target_https_port" {
   type    = number
-  default = 300443
+  default = 30443
 }
 
 variable "lb_forwarding_target_ssh_port" {
