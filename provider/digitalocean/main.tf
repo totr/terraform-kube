@@ -77,7 +77,8 @@ resource "digitalocean_droplet" "host" {
 
   provisioner "remote-exec" {
     inline = [
-      "until [ -f /var/lib/cloud/instance/boot-finished ]; do sleep 1; done"
+      "until [ -f /var/lib/cloud/instance/boot-finished ]; do sleep 1; done",
+      "curl -sSL https://repos.insights.digitalocean.com/install.sh | sudo bash"
     ]
   }
 }
