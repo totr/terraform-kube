@@ -32,16 +32,16 @@ provider "tls" {
 module "provider" {
   source = "./provider/digitalocean"
 
-  provider_client_secret          = var.provider_client_secret
-  provider_server_master_type     = var.provider_server_master_type
-  provider_server_worker_type     = var.provider_server_worker_type
-  project_name                    = var.project_name
-  master_nodes_count              = var.master_nodes_count
-  worker_nodes_count              = var.worker_nodes_count
-  lb_forwarding_target_http_port  = var.lb_forwarding_target_http_port
+  provider_client_secret           = var.provider_client_secret
+  provider_server_master_type      = var.provider_server_master_type
+  provider_server_worker_type      = var.provider_server_worker_type
+  project_name                     = var.project_name
+  master_nodes_count               = var.master_nodes_count
+  worker_nodes_count               = var.worker_nodes_count
+  lb_forwarding_target_http_port   = var.lb_forwarding_target_http_port
   lb_forwarding_target_health_port = var.lb_forwarding_target_health_port
-  lb_forwarding_target_https_port = var.lb_forwarding_target_https_port
-  lb_forwarding_target_ssh_port   = var.lb_forwarding_target_ssh_port
+  lb_forwarding_target_https_port  = var.lb_forwarding_target_https_port
+  lb_forwarding_target_ssh_port    = var.lb_forwarding_target_ssh_port
 }
 
 #module "provider" {
@@ -73,18 +73,18 @@ module "vpn" {
 module "firewall" {
   source = "./security/ufw"
 
-  server_count                    = var.master_nodes_count + var.worker_nodes_count
-  hosts                           = module.provider.public_ips
-  admin_user                      = module.provider.admin_user
-  ssh_private_key                 = module.provider.ssh_private_key
-  private_interface               = module.provider.private_network_interface
-  vpn_interface                   = module.vpn.vpn_interface
-  vpn_port                        = module.vpn.vpn_port
-  kube_overlay_interface          = var.kube_overlay_interface
-  lb_forwarding_target_http_port  = var.lb_forwarding_target_http_port
+  server_count                     = var.master_nodes_count + var.worker_nodes_count
+  hosts                            = module.provider.public_ips
+  admin_user                       = module.provider.admin_user
+  ssh_private_key                  = module.provider.ssh_private_key
+  private_interface                = module.provider.private_network_interface
+  vpn_interface                    = module.vpn.vpn_interface
+  vpn_port                         = module.vpn.vpn_port
+  kube_overlay_interface           = var.kube_overlay_interface
+  lb_forwarding_target_http_port   = var.lb_forwarding_target_http_port
   lb_forwarding_target_health_port = var.lb_forwarding_target_health_port
-  lb_forwarding_target_https_port = var.lb_forwarding_target_https_port
-  lb_forwarding_target_ssh_port   = var.lb_forwarding_target_ssh_port
+  lb_forwarding_target_https_port  = var.lb_forwarding_target_https_port
+  lb_forwarding_target_ssh_port    = var.lb_forwarding_target_ssh_port
 }
 
 module "dns" {

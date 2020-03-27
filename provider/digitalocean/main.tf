@@ -3,6 +3,10 @@ provider "digitalocean" {
   token   = var.provider_client_secret
 }
 
+locals {
+  cloud_config_path = "${path.module}/../templates/cloud-config.txt"
+}
+
 resource "tls_private_key" "access_key" {
   algorithm = "RSA"
   rsa_bits  = 4096
@@ -64,6 +68,7 @@ resource "digitalocean_droplet" "host" {
   ssh_keys           = [digitalocean_ssh_key.terraform-key.id]
   tags               = [count.index < var.master_nodes_count ? "master" : "worker"]
   count              = var.master_nodes_count + var.worker_nodes_count
+  user_data          = "${file(local.cloud_config_path)}"
 
   connection {
     host        = self.ipv4_address
@@ -72,9 +77,7 @@ resource "digitalocean_droplet" "host" {
 
   provisioner "remote-exec" {
     inline = [
-      "until [ -f /var/lib/cloud/instance/boot-finished ]; do sleep 1; done",
-      "apt-get update",
-      "apt-get install -yq ufw python-minimal python-setuptools python-netaddr"
+      "until [ -f /var/lib/cloud/instance/boot-finished ]; do sleep 1; done"
     ]
   }
 }

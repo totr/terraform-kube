@@ -1,0 +1,29 @@
+#cloud-config
+
+package_update: true
+
+# Default packages
+packages:
+  - wget
+  - git
+  - ufw
+  - python-minimal
+  - python-setuptools
+  - python-netaddr
+
+#Default limits
+write_files:
+    - content: |
+          *       -       nofile  65535
+          root    -       nofile  65535
+      path: /etc/security/limits.d/91-nofiles.conf
+      permissions: '0644'
+    - content: |
+          *       -       nproc   16384
+      path: /etc/security/limits.d/92-proc.conf
+      permissions: '0644'
+    - content: |
+          fs.inotify.max_user_watches=64000
+          fs.inotify.max_user_instances=10000
+      path: /etc/sysctl.d/61-kube.conf
+      permissions: '0644'
