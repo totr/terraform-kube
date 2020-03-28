@@ -5,7 +5,8 @@ locals {
       name       = i.name
       public_ip  = i.public_ip
       private_ip = i.private_ip
-      vpn_ip     = lookup(var.vpn_ips, i.private_ip)
+      #vpn_ip    = lookup(var.vpn_ips, i.private_ip)
+      vpn_ip     = i.private_ip
     }
   ]
 
@@ -14,7 +15,8 @@ locals {
       name       = i.name
       public_ip  = i.public_ip
       private_ip = i.private_ip
-      vpn_ip     = lookup(var.vpn_ips, i.private_ip)
+      #vpn_ip    = lookup(var.vpn_ips, i.private_ip)
+      vpn_ip     = i.private_ip
     }
   ]
 

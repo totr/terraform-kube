@@ -18,9 +18,9 @@ variable "admin_user" {
   type = string
 }
 
-variable "vpn_ips" {
-  type = map
-}
+#variable "vpn_ips" {
+#  type = map
+#}
 
 variable "dns_ip" {
   type = string
