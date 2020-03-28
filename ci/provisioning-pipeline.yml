@@ -9,7 +9,7 @@ resource_types:
   type: docker-image
   source:
     repository: totr/kubespray-builder
-    tag: 2.0.2
+    tag: 2.0.4
 
 - name: kubernetes
   type: docker-image
@@ -36,7 +36,7 @@ resources:
       secret_key: ((terraform-backend-secret-key))
     env:
       ARM_PROVIDER_TWOPOINTZERO_RESOURCES: "True"
-
+  
 - name: kubeconfig
   icon: database
   type: s3
@@ -63,6 +63,7 @@ resources:
   icon: github-circle
   source:
     uri: ((env-git-repo-uri))
+    branch: master
     tag_filter: ((env-git-repo-tag))
     git_crypt_key: ((terraform-environments-git-crypt-key))
     private_key: ((terraform-environments-git-private-key))
@@ -194,24 +195,40 @@ jobs:
         type: docker-image
         source:
           repository: totr/kubespray-builder
-          tag: 2.0.2
+          tag: 2.0.4
       platform: linux
       inputs:
       - name: terraform-kube
       - name: terraform-environments
+      - name: kubeconfig
+      params: 
+          KUBECONFIG: kubeconfig/kubeconfig.yaml 
       run:
         path: sh
         args:
         - -c
         - |
+            cp -r terraform-environments/. terraform-environments-secrets
             htpasswd -bnBC 10 "" $(cat terraform-environments/environments/((env-name)).tfvars | grep k8s_argocd_admin_pass | cut -d'=' -f2 | tr -d \") | tr -d ':\n' > argocd-config/argocd-admin-pass.ini
             cat terraform-kube/k8s-manifests/argocd/configmap.yaml | sed "s|{GIT_REPOSITORY_URL}|$(cat terraform-environments/environments/((env-name)).tfvars | grep k8s_system_apps_repo_url | cut -d'=' -f2 | tr -d \ | xargs echo -n)|g" > argocd-config/configmap.yaml
             cat terraform-kube/k8s-manifests/argocd/system-apps.yaml | sed "s|{GIT_REPOSITORY_URL}|$(cat terraform-environments/environments/((env-name)).tfvars | grep k8s_system_apps_repo_url | cut -d'=' -f2 | tr -d \ | xargs echo -n)|g" > argocd-config/system-apps.yaml
             cat terraform-kube/k8s-manifests/argocd/system-apps-secret.yaml | sed "s|{SSH_PRIVATE_KEY}|$(cat terraform-environments/environments/((env-name)).tfvars | grep k8s_system_apps_repo_private_key | cut -d'=' -f2 | tr -d \ | xargs echo -n)|g" > argocd-config/system-apps-secret.yaml
             cat argocd-config/system-apps.yaml | sed "s|{GIT_REPOSITORY_REVISION}|$(cat terraform-environments/environments/((env-name)).tfvars | grep k8s_system_apps_repo_revision | cut -d'=' -f2 | tr -d \ | xargs echo -n)|g" > argocd-config/system-apps.yaml
             cat argocd-config/system-apps.yaml | sed "s|{SYSTEM_APPS_SOURCE_PATH}|$(cat terraform-environments/environments/((env-name)).tfvars | grep k8s_system_apps_source_path | cut -d'=' -f2 | tr -d \ | xargs echo -n)|g" > argocd-config/system-apps.yaml
+            cat terraform-kube/k8s-manifests/argocd/update-values-template.yaml | sed "s|{DNS_API_KEY}|$(cat terraform-environments/environments/((env-name)).tfvars | grep dns_api_token | cut -d'=' -f2 | tr -d \ | xargs echo -n | kubeseal --raw --from-file=/dev/stdin --namespace istio-system --scope namespace-wide)|g" > argocd-config/update-values.yaml
+            cat argocd-config/update-values.yaml | sed "s|{STORAGE_TOKEN}|$(cat terraform-environments/environments/((env-name)).tfvars | grep provider_client_secret | cut -d'=' -f2 | tr -d \ | xargs echo -n | kubeseal --raw --from-file=/dev/stdin --namespace kube-system --scope namespace-wide)|g" > argocd-config/update-values.yaml
+            cat argocd-config/update-values.yaml | yq w -s - terraform-environments/((env-name))/applications/values.yaml > terraform-environments-secrets/((env-name))/applications/values.yaml
+            cd terraform-environments-secrets
+            git config --global user.name "Concourse CI"
+            git config --global user.email "concourse@concourse.ci"
+            git add .
+            git commit -m "Generating secrets"
       outputs:
         - name: argocd-config
+        - name: terraform-environments-secrets
+  - put: terraform-environments
+    params:
+      repository: terraform-environments-secrets
   - put: argocd-configure-auth
     resource: k8s-components
     params:
