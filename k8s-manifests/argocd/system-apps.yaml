@@ -13,7 +13,7 @@ spec:
   source:
     path: {SYSTEM_APPS_SOURCE_PATH}
     repoURL: {GIT_REPOSITORY_URL}
-    targetRevision: {GIT_REPOSITORY_REVISION}
+    targetRevision: HEAD
     helm:
       valueFiles:
         - values.yaml
