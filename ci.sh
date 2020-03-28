@@ -6,7 +6,7 @@ if [ "$1" == "up" ]; then
 		echo "\nThe following parameters are required: \n"
 		echo "environment_git_repo_uri:   git repository containing terraform variables"
 		echo "environment_git_repo_tag:   git repository tag"
-		echo "environment_name:           folder name inside the 'environments' subfolder in git repository \n"
+		echo "environment_name:           terraform config file name\n"
     	echo "Example: ./ci.sh up https://github.com/totr/terraform-kube-environments v1.0.0 dev-hc \n"
     	exit 1
 	fi

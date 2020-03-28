@@ -4,7 +4,7 @@
 
 Create a project in Hetzner Cloud environment. 
 
-Create a local file with the name <PROJECT_ID>.tfvars in *environments* folder and fill in the following parameter:
+Create a local file with the name <PROJECT_ID>.tfvars and fill in the following parameter:
 
 ```
 provider_token =
@@ -31,7 +31,7 @@ az account set --subscription="<SUBSCRIPTION_ID>"
 az ad sp create-for-rbac --role="Contributor" --scopes="/subscriptions/<SUBSCRIPTION_ID>"
 ```
 
-Create a local file with the name <PROJECT_ID>.tfvars in *environments* folder and fill in the following parameter:
+Create a local file with the name <PROJECT_ID>.tfvars and fill in the following parameter:
 
 ```
 provider_token =
@@ -57,7 +57,7 @@ provider_token =
 
 
 
-Add the following parameters to the file <PROJECT_ID>.tfvars in *environments* folder.
+Add the following parameters to the file <PROJECT_ID>.tfvars.
 ```
 domain =
 email = 
@@ -70,7 +70,7 @@ dns_api_token =
 | dns_api_token  | Cloudflare Global API Key | 
 
 ## Kubernetes ArgoCD
-Add the following parameter to the file <PROJECT_ID>.tfvars in *environments* folder.
+Add the following parameter to the file <PROJECT_ID>.tfvars.
 ```
 k8s_argocd_admin_pass =
 ```

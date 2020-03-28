@@ -49,7 +49,7 @@ jobs:
     - put: terraform-state
       params:
         env_name: ((env-name))
-        var_files: [terraform-environments/environments/((env-name)).tfvars]
+        var_files: [terraform-environments/((env-name)).tfvars]
         terraform_source: terraform-kube
         action: destroy
       get_params:
