@@ -5,6 +5,7 @@ kube_proxy_mode: ipvs
 kube_proxy_strict_arp: true
 kube_config_dir: /etc/kubernetes
 bin_dir: /usr/local/bin
+weave_version: 2.6.2
 kube_kubeadm_apiserver_extra_args:                                          
   service-account-issuer: api
   service-account-signing-key-file: /etc/kubernetes/ssl/sa.key
