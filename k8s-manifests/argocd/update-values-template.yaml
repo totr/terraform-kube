@@ -1,0 +1,6 @@
+- command: update
+  path: dns.admin.apiKey
+  value: {DNS_API_KEY}
+- command: update
+  path: iaasProvider.storage.token
+  value: {STORAGE_TOKEN}
