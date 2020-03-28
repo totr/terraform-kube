@@ -17,13 +17,13 @@ variable "private_interface" {
   type = string
 }
 
-variable "vpn_interface" {
-  type = string
-}
+#variable "vpn_interface" {
+#  type = string
+#}
 
-variable "vpn_port" {
-  type = string
-}
+#variable "vpn_port" {
+#  type = string
+#}
 
 variable "kube_overlay_interface" {
   type = string

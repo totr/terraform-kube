@@ -58,17 +58,17 @@ module "provider" {
 #  worker_nodes_count         = var.worker_nodes_count
 #}
 
-module "vpn" {
-  source = "./security/wireguard"
-
-  server_count    = var.master_nodes_count + var.worker_nodes_count
-  hosts           = module.provider.public_ips
-  admin_user      = module.provider.admin_user
-  ssh_private_key = module.provider.ssh_private_key
-  private_ips     = module.provider.private_ips
-  hostnames       = module.provider.hostnames
-  overlay_cidr    = var.kube_service_addresses
-}
+#module "vpn" {
+#  source = "./security/wireguard"
+#
+#  server_count    = var.master_nodes_count + var.worker_nodes_count
+#  hosts           = module.provider.public_ips
+#  admin_user      = module.provider.admin_user
+#  ssh_private_key = module.provider.ssh_private_key
+#  private_ips     = module.provider.private_ips
+#  hostnames       = module.provider.hostnames
+#  overlay_cidr    = var.kube_service_addresses
+#}
 
 module "firewall" {
   source = "./security/ufw"
@@ -78,8 +78,8 @@ module "firewall" {
   admin_user                       = module.provider.admin_user
   ssh_private_key                  = module.provider.ssh_private_key
   private_interface                = module.provider.private_network_interface
-  vpn_interface                    = module.vpn.vpn_interface
-  vpn_port                         = module.vpn.vpn_port
+  #vpn_interface                    = module.vpn.vpn_interface
+  #vpn_port                         = module.vpn.vpn_port
   kube_overlay_interface           = var.kube_overlay_interface
   lb_forwarding_target_http_port   = var.lb_forwarding_target_http_port
   lb_forwarding_target_health_port = var.lb_forwarding_target_health_port
@@ -102,7 +102,7 @@ module "provisioner" {
   master_nodes                 = module.provider.master_nodes
   worker_nodes                 = module.provider.worker_nodes
   admin_user                   = module.provider.admin_user
-  vpn_ips                      = module.vpn.vpn_ips
+  #vpn_ips                      = module.vpn.vpn_ips
   cloud_provider_load_balancer = module.provider.cloud_provider_load_balancer
   dns_ip                       = module.provider.dns_ip
   kube_network_plugin          = var.kube_network_plugin
