@@ -63,12 +63,12 @@ variable "kube_pods_subnet" {
 
 variable "kube_network_plugin" {
   type    = string
-  default = "weave"
+  default = "flannel"
 }
 
 variable "kube_overlay_interface" {
   type    = string
-  default = "weave"
+  default = "flannel"
 }
 
 variable "lb_forwarding_target_health_port" {
