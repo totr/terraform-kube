@@ -28,8 +28,8 @@ locals {
   })
 
   cluster_vars = templatefile("${path.module}/templates/k8s-cluster.yaml", {
-    kube_service_addresses = var.kube_service_addresses
-    kube_pods_subnet       = var.kube_pods_subnet
+    #kube_service_addresses = var.kube_service_addresses
+    #kube_pods_subnet       = var.kube_pods_subnet
     kube_network_plugin    = var.kube_network_plugin
   })
 
