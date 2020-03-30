@@ -11,7 +11,7 @@ spec:
     server: https://kubernetes.default.svc
   project: default
   source:
-    path: "factory/applications"
+    path: "box/applications"
     repoURL: "git@github.com:StratoxEnterprises/codenow-customer-space-customer7.git"
     targetRevision: HEAD
     helm:
