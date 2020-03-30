@@ -1,4 +1,5 @@
 kube_network_plugin: ${kube_network_plugin}
+flannel_interface: eth1
 #kube_service_addresses: kube_service_addresses
 #kube_pods_subnet: kube_pods_subnet
 kube_proxy_mode: ipvs
