@@ -9,7 +9,7 @@ spec:
   destination:
     namespace: argocd
     server: https://kubernetes.default.svc
-  project: default
+  project: system-apps
   source:
     path: {SYSTEM_APPS_SOURCE_PATH}
     repoURL: {GIT_REPOSITORY_URL}

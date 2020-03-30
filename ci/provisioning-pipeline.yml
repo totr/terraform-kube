@@ -17,7 +17,7 @@ resource_types:
     repository: zlabjp/kubernetes-resource
     tag: "1.16"
 
-resources:
+resources: 
 - name: terraform-state
   type: terraform 
   icon: database
@@ -35,8 +35,8 @@ resources:
       access_key: ((terraform-backend-access-key))
       secret_key: ((terraform-backend-secret-key))
     env:
-      ARM_PROVIDER_TWOPOINTZERO_RESOURCES: "True"  
-      
+      ARM_PROVIDER_TWOPOINTZERO_RESOURCES: "True"
+        
 - name: kubeconfig
   icon: database
   type: s3
@@ -168,7 +168,7 @@ jobs:
     - put: kubeconfig
       params:
         file: k8s-conf/admin.conf
-
+  
 - name: deploy-k8s-components
   plan:
   - get: terraform-kube
@@ -212,15 +212,12 @@ jobs:
             cat terraform-kube/k8s-manifests/argocd/configmap.yaml | sed 's|{GIT_REPOSITORY_URL}|"((env-git-repo-uri))"|g' > argocd-config/configmap.yaml
             echo -n "((terraform-environments-git-private-key))" | base64 -w 0 > argocd-config/ssh.key
             cat terraform-kube/k8s-manifests/argocd/system-apps-secret.yaml | sed "s|{SSH_PRIVATE_KEY}|$(cat argocd-config/ssh.key)|g" > argocd-config/system-apps-secret.yaml
-            cat terraform-kube/k8s-manifests/argocd/system-apps.yaml | sed 's|{GIT_REPOSITORY_URL}|"((env-git-repo-uri))"|g' > argocd-config/system-apps.yaml
-            cat argocd-config/system-apps.yaml
-            cat argocd-config/system-apps.yaml | sed "s|{SYSTEM_APPS_SOURCE_PATH}|((env-name))/applications|g" > argocd-config/system-apps.yaml
-            cat argocd-config/system-apps.yaml
-            cp terraform-kube/k8s-manifests/argocd/system-apps.yaml argocd-config/system-apps.yaml
-            cat argocd-config/system-apps.yaml
+            cat terraform-kube/k8s-manifests/argocd/system-apps.yaml | sed 's|{SYSTEM_APPS_SOURCE_PATH}|"((env-name))/applications"|g' > argocd-config/system-apps-tmp.yaml
+            cat argocd-config/system-apps-tmp.yaml | sed 's|{GIT_REPOSITORY_URL}|"((env-git-repo-uri))"|g' > argocd-config/system-apps.yaml            
             cat terraform-kube/k8s-manifests/argocd/update-values-template.yaml | sed "s|{DNS_API_KEY}|$(cat terraform-environments/((env-name)).tfvars | grep dns_api_token | cut -d'=' -f2 | tr -d \ | xargs echo -n | kubeseal --raw --from-file=/dev/stdin --namespace istio-system --name dns-api-key-secret)|g" > argocd-config/update-values.yaml
             cat argocd-config/update-values.yaml | sed "s|{STORAGE_TOKEN}|$(cat terraform-environments/((env-name)).tfvars | grep provider_client_secret | cut -d'=' -f2 | tr -d \ | xargs echo -n | kubeseal --raw --from-file=/dev/stdin --namespace kube-system --name digitalocean)|g" > argocd-config/update-values.yaml
             cat argocd-config/update-values.yaml | yq w -s - terraform-environments/((env-name))/applications/values.yaml > terraform-environments-secrets/((env-name))/applications/values.yaml
+            cp terraform-kube/k8s-manifests/argocd/system-apps-project.yaml argocd-config/system-apps-project.yaml
             cd terraform-environments-secrets
             git config --global user.name "Concourse CI"
             git config --global user.email "concourse@concourse.ci"
@@ -256,10 +253,10 @@ jobs:
       kubectl: | 
         apply -n argocd -f argocd-config/system-apps-secret.yaml
       kubeconfig_file: kubeconfig/kubeconfig.yaml
-  - put: argocd-register-system-apps
+  - put: argocd-register-system-apps-project
     resource: k8s-components
     params:
-      kubectl: apply -n argocd -f argocd-config/system-apps.yaml
+      kubectl: apply -n argocd -f argocd-config/system-apps-project.yaml
       kubeconfig_file: kubeconfig/kubeconfig.yaml
   - put: argocd-patch-deployment
     resource: k8s-components
@@ -273,4 +270,9 @@ jobs:
     params:
       kubectl: delete pods -n argocd -l app.kubernetes.io/name=argocd-server
       wait_until_ready_selector: app.kubernetes.io/name=argocd-server
-      kubeconfig_file: kubeconfig/kubeconfig.yaml 
+      kubeconfig_file: kubeconfig/kubeconfig.yaml
+  - put: argocd-register-system-apps
+    resource: k8s-components
+    params:
+      kubectl: apply -n argocd -f argocd-config/system-apps.yaml
+      kubeconfig_file: kubeconfig/kubeconfig.yaml
