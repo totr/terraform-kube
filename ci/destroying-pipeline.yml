@@ -10,7 +10,7 @@ resources:
   type: terraform 
   icon: database
   source:
-    env_name: ((env-name))
+    env_name: ((env-group-name))-((env-name))
     backend_type: s3
     backend_config:
 # see https://wasabi-support.zendesk.com/hc/en-us/articles/360003362071-How-I-do-use-Terraform-with-Wasabi-
@@ -30,7 +30,7 @@ resources:
   icon: github-circle
   source:
     uri: https://github.com/totr/terraform-kube
-    branch: master
+    branch: feature/digitalocean-flannel
 
 - name: terraform-environments
   type: git
@@ -48,7 +48,7 @@ jobs:
     - get: terraform-environments
     - put: terraform-state
       params:
-        env_name: ((env-name))
+        env_name: ((env-group-name))-((env-name))
         var_files: [terraform-environments/((env-name)).tfvars]
         terraform_source: terraform-kube
         action: destroy

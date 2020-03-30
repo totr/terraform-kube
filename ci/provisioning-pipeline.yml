@@ -22,7 +22,7 @@ resources:
   type: terraform 
   icon: database
   source:
-    env_name: ((env-name))
+    env_name: ((env-group-name))-((env-name))
     backend_type: s3
     backend_config:
 # see https://wasabi-support.zendesk.com/hc/en-us/articles/360003362071-How-I-do-use-Terraform-with-Wasabi-
@@ -35,8 +35,8 @@ resources:
       access_key: ((terraform-backend-access-key))
       secret_key: ((terraform-backend-secret-key))
     env:
-      ARM_PROVIDER_TWOPOINTZERO_RESOURCES: "True"
-  
+      ARM_PROVIDER_TWOPOINTZERO_RESOURCES: "True"  
+      
 - name: kubeconfig
   icon: database
   type: s3
@@ -44,7 +44,7 @@ resources:
     endpoint: "https://s3.eu-central-1.wasabisys.com"
     region_name: eu-central-1
     bucket: ((terraform-backend-bucket))
-    versioned_file: env:/((env-name))/kubeconfig.yaml
+    versioned_file: env:/((env-group-name))-((env-name))/kubeconfig.yaml
     access_key_id: ((terraform-backend-access-key))
     secret_access_key: ((terraform-backend-secret-key))
 
@@ -56,7 +56,7 @@ resources:
   icon: github-circle
   source:
     uri: https://github.com/totr/terraform-kube
-    branch: master
+    branch: feature/digitalocean-flannel
 
 - name: terraform-environments
   type: git
@@ -90,10 +90,9 @@ jobs:
   plan:
     - get: terraform-kube
     - get: terraform-environments
-      trigger: true
     - put: terraform-state
       params:
-        env_name: ((env-name))
+        env_name: ((env-group-name))-((env-name))
         var_files: [terraform-environments/((env-name)).tfvars]
         terraform_source: terraform-kube
 
@@ -210,12 +209,17 @@ jobs:
         - |
             cp -r terraform-environments/. terraform-environments-secrets
             htpasswd -bnBC 10 "" $(cat terraform-environments/((env-name)).tfvars | grep k8s_argocd_admin_pass | cut -d'=' -f2 | tr -d \") | tr -d ':\n' > argocd-config/argocd-admin-pass.ini
-            cat terraform-kube/k8s-manifests/argocd/configmap.yaml | sed "s|{GIT_REPOSITORY_URL}|((env-git-repo-uri))|g" > argocd-config/configmap.yaml
-            cat terraform-kube/k8s-manifests/argocd/system-apps.yaml | sed "s|{GIT_REPOSITORY_URL}|((env-git-repo-uri))|g" > argocd-config/system-apps.yaml
-            cat terraform-kube/k8s-manifests/argocd/system-apps-secret.yaml | sed "s|{SSH_PRIVATE_KEY}|((terraform-environments-git-private-key))|g" > argocd-config/system-apps-secret.yaml
+            cat terraform-kube/k8s-manifests/argocd/configmap.yaml | sed 's|{GIT_REPOSITORY_URL}|"((env-git-repo-uri))"|g' > argocd-config/configmap.yaml
+            echo -n "((terraform-environments-git-private-key))" | base64 -w 0 > argocd-config/ssh.key
+            cat terraform-kube/k8s-manifests/argocd/system-apps-secret.yaml | sed "s|{SSH_PRIVATE_KEY}|$(cat argocd-config/ssh.key)|g" > argocd-config/system-apps-secret.yaml
+            cat terraform-kube/k8s-manifests/argocd/system-apps.yaml | sed 's|{GIT_REPOSITORY_URL}|"((env-git-repo-uri))"|g' > argocd-config/system-apps.yaml
+            cat argocd-config/system-apps.yaml
             cat argocd-config/system-apps.yaml | sed "s|{SYSTEM_APPS_SOURCE_PATH}|((env-name))/applications|g" > argocd-config/system-apps.yaml
-            cat terraform-kube/k8s-manifests/argocd/update-values-template.yaml | sed "s|{DNS_API_KEY}|$(cat terraform-environments/((env-name)).tfvars | grep dns_api_token | cut -d'=' -f2 | tr -d \ | xargs echo -n | kubeseal --raw --from-file=/dev/stdin --namespace istio-system --scope namespace-wide)|g" > argocd-config/update-values.yaml
-            cat argocd-config/update-values.yaml | sed "s|{STORAGE_TOKEN}|$(cat terraform-environments/((env-name)).tfvars | grep provider_client_secret | cut -d'=' -f2 | tr -d \ | xargs echo -n | kubeseal --raw --from-file=/dev/stdin --namespace kube-system --scope namespace-wide)|g" > argocd-config/update-values.yaml
+            cat argocd-config/system-apps.yaml
+            cp terraform-kube/k8s-manifests/argocd/system-apps.yaml argocd-config/system-apps.yaml
+            cat argocd-config/system-apps.yaml
+            cat terraform-kube/k8s-manifests/argocd/update-values-template.yaml | sed "s|{DNS_API_KEY}|$(cat terraform-environments/((env-name)).tfvars | grep dns_api_token | cut -d'=' -f2 | tr -d \ | xargs echo -n | kubeseal --raw --from-file=/dev/stdin --namespace istio-system --name dns-api-key-secret)|g" > argocd-config/update-values.yaml
+            cat argocd-config/update-values.yaml | sed "s|{STORAGE_TOKEN}|$(cat terraform-environments/((env-name)).tfvars | grep provider_client_secret | cut -d'=' -f2 | tr -d \ | xargs echo -n | kubeseal --raw --from-file=/dev/stdin --namespace kube-system --name digitalocean)|g" > argocd-config/update-values.yaml
             cat argocd-config/update-values.yaml | yq w -s - terraform-environments/((env-name))/applications/values.yaml > terraform-environments-secrets/((env-name))/applications/values.yaml
             cd terraform-environments-secrets
             git config --global user.name "Concourse CI"

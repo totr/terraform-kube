@@ -2,17 +2,19 @@
 
 extra_args=""
 if [ "$1" == "up" ]; then
-    if [ -z "$2" ] || [ -z "$3" ] || [ -z "$4" ]; then
+    if [ -z "$2" ] || [ -z "$3" ] || [ -z "$4" ] | [ -z "$5" ]; then
 		echo "\nThe following parameters are required: \n"
 		echo "environment_git_repo_uri:   git repository containing terraform variables"
 		echo "environment_git_repo_tag:   git repository tag"
+		echo "environment_group_name:     terraform environment group name"
 		echo "environment_name:           terraform config file name\n"
-    	echo "Example: ./ci.sh up https://github.com/totr/terraform-kube-environments v1.0.0 dev-hc \n"
-    	exit 1
+		echo "Example: ./ci.sh up https://github.com/totr/terraform-kube-environments v1.0.0 customer1 prod \n"
+		exit 1
 	fi
 	export ENVIRONMENT_GIT_REPO_URI=$2
 	export ENVIRONMENT_GIT_REPO_TAG=$3
-	export ENVIRONMENT_NAME=$4
+	export ENVIRONMENT_GROUP_NAME=$4
+	export ENVIRONMENT_NAME=$5
 	extra_args="-d --force-recreate"
 fi
 
