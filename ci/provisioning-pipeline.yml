@@ -64,7 +64,6 @@ resources:
   source:
     uri: ((env-git-repo-uri))
     branch: master
-    tag_filter: ((env-git-repo-tag))
     git_crypt_key: ((terraform-environments-git-crypt-key))
     private_key: ((terraform-environments-git-private-key))
 
