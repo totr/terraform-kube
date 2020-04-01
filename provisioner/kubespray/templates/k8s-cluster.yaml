@@ -2,6 +2,9 @@ kube_network_plugin: ${kube_network_plugin}
 flannel_interface: eth1
 #kube_service_addresses: kube_service_addresses
 #kube_pods_subnet: kube_pods_subnet
+kube_controller_node_monitor_grace_period: "20s" 
+kube_controller_node_monitor_period: "2s"
+kube_controller_pod_eviction_timeout: "30s"
 kube_proxy_mode: ipvs
 kube_proxy_strict_arp: true
 kube_config_dir: /etc/kubernetes
