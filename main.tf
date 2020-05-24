@@ -18,6 +18,13 @@ provider "tls" {
   version = "~> 2.1"
 }
 
+# FIXME interpolation for source parmeter inside module https://github.com/hashicorp/terraform/issues/1439
+
+module "provider" {
+  source = "./provider/libvirt"
+
+}
+
 #module "provider" {
 #  source = "./provider/hcloud"
 
@@ -73,11 +80,11 @@ module "provider" {
 module "firewall" {
   source = "./security/ufw"
 
-  server_count                     = var.master_nodes_count + var.worker_nodes_count
-  hosts                            = module.provider.public_ips
-  admin_user                       = module.provider.admin_user
-  ssh_private_key                  = module.provider.ssh_private_key
-  private_interface                = module.provider.private_network_interface
+  server_count      = var.master_nodes_count + var.worker_nodes_count
+  hosts             = module.provider.public_ips
+  admin_user        = module.provider.admin_user
+  ssh_private_key   = module.provider.ssh_private_key
+  private_interface = module.provider.private_network_interface
   #vpn_interface                    = module.vpn.vpn_interface
   #vpn_port                         = module.vpn.vpn_port
   kube_overlay_interface           = var.kube_overlay_interface
@@ -99,9 +106,9 @@ module "dns" {
 module "provisioner" {
   source = "./provisioner/kubespray"
 
-  master_nodes                 = module.provider.master_nodes
-  worker_nodes                 = module.provider.worker_nodes
-  admin_user                   = module.provider.admin_user
+  master_nodes = module.provider.master_nodes
+  worker_nodes = module.provider.worker_nodes
+  admin_user   = module.provider.admin_user
   #vpn_ips                      = module.vpn.vpn_ips
   cloud_provider_load_balancer = module.provider.cloud_provider_load_balancer
   dns_ip                       = module.provider.dns_ip
