@@ -1,3 +1,11 @@
+variable "provider_url" {
+  type = string
+}
+
+variable "provider_client_secret" {
+  type = string
+}
+
 variable "provider_admin_user" {
   type    = string
   default = "root"

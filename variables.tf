@@ -15,14 +15,17 @@ variable "azure_provider_client_id" {
 
 variable "provider_client_secret" {
   type = string
+  default = ""
 }
 
 variable provider_server_master_type {
   type = string
+  default = ""
 }
 
 variable provider_server_worker_type {
   type = string
+  default = ""
 }
 
 variable "project_name" {

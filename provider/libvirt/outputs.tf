@@ -1,5 +1,5 @@
 output "public_ips" {
-  value = ""
+  value = list("")
 }
 
 output "admin_user" {
@@ -23,11 +23,11 @@ output "ssh_private_key" {
 }
 
 output "master_nodes" {
-  value = ""
+  value = list(object())
 }
 
 output "worker_nodes" {
-  value = ""
+  value = list(object())
 }
 
 output "cloud_provider_load_balancer" {

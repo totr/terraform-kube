@@ -1,33 +1,35 @@
 # FIXME dynamic providers https://github.com/hashicorp/terraform/issues/3656,
 # possibly using dynamic modules https://github.com/hashicorp/terraform/issues/17519
 
+
+
 provider "libvirt" {
   version = "~> 0.6"
-  uri     = "qemu+ssh://tt@10.211.55.5/system"
-  alieas  = "hypervisor-1"
+  uri     = var.provider_url
 }
 
 provider "libvirt" {
   version = "~> 0.6"
-  uri     = "qemu+ssh://tt@10.211.55.5/system"
-  alieas  = "hypervisor-2"
+  uri     = var.provider_url
+  alias   = "hypervisor-2"
 }
 
 provider "libvirt" {
   version = "~> 0.6"
-  uri     = "qemu+ssh://tt@10.211.55.5/system"
-  alieas  = "hypervisor-3"
+  uri     = var.provider_url
+  alias   = "hypervisor-3"
 }
 
 locals {
   hypervisors = ["libvirt.hypervisor-1", "libvirt.hypervisor-2", "libvirt.hypervisor-3"]
+  cloud_config_path = "${path.module}/../templates/cloud-config.txt"
 }
 
 # https://www.reddit.com/r/Terraform/comments/cwp0d4/terraform_multi_region_question_can_i_just_use/
 
 resource "libvirt_volume" "main" {
-  name = "main-volume"
-  pool = "images"
+  name   = "main-volume"
+  pool   = "images"
   source = var.provider_server_image
   format = "qcow2"
 }
@@ -48,9 +50,9 @@ data "template_file" "user_data" {
 #}
 
 resource "libvirt_domain" "host" {
-  name = "ubuntu-terraform"
+  name   = "ubuntu-terraform"
   memory = "512"
-  vcpu = 1
+  vcpu   = 1
 
   cloudinit = libvirt_cloudinit_disk.main.id
 
@@ -68,18 +70,18 @@ resource "libvirt_domain" "host" {
   }
 
   console {
-      type        = "pty"
-      target_type = "virtio"
-      target_port = "1"
+    type        = "pty"
+    target_type = "virtio"
+    target_port = "1"
   }
 
   disk {
-      volume_id =  libvirt_volume.main.id
+    volume_id = libvirt_volume.main.id
   }
 
   graphics {
-    type = "spice"
+    type        = "spice"
     listen_type = "address"
-    autoport = "true"
+    autoport    = "true"
   }
 }

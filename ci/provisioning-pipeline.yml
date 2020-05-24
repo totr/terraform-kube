@@ -3,7 +3,7 @@ resource_types:
   type: docker-image
   source:
     repository: totr/terraform-kube-builder
-    tag: 0.12.18
+    tag: 2.0.0
 
 - name: ansible
   type: docker-image
@@ -35,6 +35,7 @@ resources:
       access_key: ((terraform-backend-access-key))
       secret_key: ((terraform-backend-secret-key))
     env:
+      TF_LOG: TRACE 
       ARM_PROVIDER_TWOPOINTZERO_RESOURCES: "True"
         
 - name: kubeconfig
@@ -56,7 +57,7 @@ resources:
   icon: github-circle
   source:
     uri: https://github.com/totr/terraform-kube
-    branch: feature/digitalocean-flannel
+    branch: feature/libvirt-provider
 
 - name: terraform-environments
   type: git
