@@ -1,0 +1,6 @@
+---
+- name: "patch {{ type }} {{ name }} in namespace {{ namespace }}"
+  shell: kubectl patch {{ type }} --namespace {{ namespace }} {{ name }} {{ patch_parameters }} -p '{{ patch }}'
+  register: result
+  changed_when: "'not patched' not in result.stdout and 'Duplicate value' not in result.stderr and '(no change)' not in result.stdout"
+  failed_when: "result.rc != 0 and 'not patched' not in result.stdout and 'Duplicate value' not in result.stderr" 

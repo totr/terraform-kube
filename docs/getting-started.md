@@ -61,22 +61,22 @@ Add the following parameters to the file <PROJECT_ID>.tfvars.
 ```
 domain =
 email = 
-dns_api_token =
+dns_admin_api_token =
 ```
 | Name  | Description  | 
 |---|---|
 | domain  | Domain  | 
 | email  | Cloudflare login email  | 
-| dns_api_token  | Cloudflare Global API Key | 
+| dns_admin_api_token  | Cloudflare Global API Key | 
 
 ## Kubernetes ArgoCD
 Add the following parameter to the file <PROJECT_ID>.tfvars.
 ```
-k8s_argocd_admin_pass =
+argocd_admin_password =
 ```
 | Name  | Description  | 
 |---|---|
-| k8s_argocd_admin_pass  | ArgoCD password for admin user | 
+| argocd_admin_password  | ArgoCD password for admin user | 
 
 
 ## Concourse CI

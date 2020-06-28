@@ -18,11 +18,13 @@ variable "provider_client_secret" {
 }
 
 variable provider_server_master_type {
-  type = string
+  type    = string
+  default = ""
 }
 
 variable provider_server_worker_type {
-  type = string
+  type    = string
+  default = ""
 }
 
 variable "project_name" {
@@ -37,7 +39,7 @@ variable "email" {
   type = string
 }
 
-variable "dns_api_token" {
+variable "dns_admin_api_token" {
   type = string
 }
 

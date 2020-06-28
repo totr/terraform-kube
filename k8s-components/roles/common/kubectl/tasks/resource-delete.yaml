@@ -1,0 +1,5 @@
+---
+- name: "delete {{ type }} {{ name }} in namespace {{ namespace }}"
+  shell: "kubectl delete {{ type }} {{ name }} --namespace {{ namespace }}"
+  register: result
+  changed_when: "'deleted' in result.stdout"

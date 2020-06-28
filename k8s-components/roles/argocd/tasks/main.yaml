@@ -1,0 +1,110 @@
+---
+- include_role:
+    name: common/kubectl
+    tasks_from: resource-create
+  vars:
+    parameters: "namespace {{ argocd_namespace }}"
+
+- include_role:
+    name: common/kubectl
+    tasks_from: resource-create
+  vars:
+    parameters: "-n {{ argocd_namespace }} -f {{ argocd_download_url }}"
+
+- include_role:
+    name: common/templates
+    tasks_from: process-template
+  vars:
+    target_dir_path: "{{ install_dir }}/argocd"
+    source_file_path: roles/argocd/templates/configmap.yaml.j2
+    target_file_name: configmap.yaml
+
+- include_role:
+    name: common/kubectl
+    tasks_from: resource-delete
+  vars:
+    namespace: "{{ argocd_namespace }}"
+    type: configmap
+    name: argocd-cm
+
+- include_role:
+    name: common/kubectl
+    tasks_from: resource-create
+  vars:
+    parameters: "-n {{ argocd_namespace }} -f {{ install_dir }}/argocd/configmap.yaml"
+
+- name: encode argocd admin password 
+  shell: "htpasswd -bnBC 10 '' {{ argocd_admin_password }} | tr -d ':\n'"
+  register: argocd_admin_password_encoded
+  changed_when: False
+
+- include_role:
+    name: common/templates
+    tasks_from: process-template
+  vars:
+    target_dir_path: "{{ install_dir }}/argocd"
+    source_file_path: roles/argocd/templates/system-apps-secret.yaml.j2
+    target_file_name: system-apps-secret.yaml
+
+- include_role:
+    name: common/kubectl
+    tasks_from: resource-create
+  vars:
+    parameters: "-n {{ argocd_namespace }} -f {{ install_dir }}/argocd/system-apps-secret.yaml"
+
+- include_role:
+    name: common/kubectl
+    tasks_from: resource-create
+  vars:
+    parameters: "-n {{ argocd_namespace }} -f roles/argocd/files/system-apps-project.yaml"
+
+- include_role:
+    name: common/kubectl
+    tasks_from: resource-patch
+  vars:
+    namespace: "{{ argocd_namespace }}"
+    type: secret
+    name: argocd-secret
+    patch_parameters: ""
+    patch: "{{ argocd_secret_patch | to_json }}"
+
+- include_role:
+    name: common/kubectl
+    tasks_from: resource-patch
+  vars:
+    namespace: "{{ argocd_namespace }}"
+    type: deployment
+    name: argocd-server
+    patch_parameters: "--type='json'"
+    patch: '[{"op":"add","path":"/spec/template/spec/containers/0/command/1","value":"--insecure"}]'
+
+- include_role:
+    name: common/kubectl
+    tasks_from: resource-delete
+  vars:
+    name: "-l app.kubernetes.io/name=argocd-server"
+    type: pods
+    namespace: "{{ argocd_namespace }}"
+
+- include_role:
+    name: common/kubectl
+    tasks_from: rollout-status
+  vars:
+    name: argocd-server
+    type: deployment
+    namespace: "{{ argocd_namespace }}"
+    result_var_name: argocd_status_result
+
+- include_role:
+    name: common/templates
+    tasks_from: process-template
+  vars:
+    target_dir_path: "{{ install_dir }}/argocd"
+    source_file_path: roles/argocd/templates/system-apps.yaml.j2
+    target_file_name: system-apps.yaml
+
+- include_role:
+    name: common/kubectl
+    tasks_from: resource-create
+  vars:
+    parameters: "-n {{ argocd_namespace }} -f {{ install_dir }}/argocd/system-apps.yaml"

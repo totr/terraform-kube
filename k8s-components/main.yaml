@@ -1,0 +1,17 @@
+---
+- name: install k8s components
+  hosts: all
+  become: false
+  
+  pre_tasks:
+    - name: "create {{ install_dir }} directory"
+      file: 
+        path: "{{ install_dir }}"
+        recurse: yes
+        state: directory
+      changed_when: False
+      run_once: yes
+
+  roles:
+    - {role: 'sealed-secrets'}
+    - {role: 'argocd'}

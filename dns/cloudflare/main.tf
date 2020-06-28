@@ -5,7 +5,7 @@ locals {
 
 provider "cloudflare" {
   version = "~> 2.3"
-  email   = var.email
+  email   = var.admin_email
   api_key = var.api_token
 }
 
@@ -20,7 +20,7 @@ data "cloudflare_zones" "domain_zones" {
 resource "cloudflare_record" "domain" {
   zone_id = local.zone_id
   name    = var.domain
-  value   = var.dns_ip
+  value   = var.ip_address
   type    = "A"
   proxied = true
 }

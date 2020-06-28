@@ -1,0 +1,119 @@
+resource_types:
+- name: terraform
+  type: docker-image
+  source:
+    repository: totr/terraform-kube-builder
+    tag: 2.0.0
+
+- name: ansible
+  type: docker-image
+  source:
+    repository: totr/kubespray-builder
+    tag: 2.1.0
+
+resources: 
+- name: terraform-state
+  type: terraform 
+  icon: database
+  source:
+    env_name: ((env-group-name))-((env-name))
+    backend_type: s3
+    backend_config:
+      # see https://wasabi-support.zendesk.com/hc/en-us/articles/360003362071-How-I-do-use-Terraform-with-Wasabi-
+      endpoint: "https://s3.eu-central-1.wasabisys.com"
+      skip_credentials_validation: true
+      skip_metadata_api_check: true
+      bucket: ((terraform-backend-bucket))
+      key: terraform.tfstate
+      region: eu-central-1
+      access_key: ((terraform-backend-access-key))
+      secret_key: ((terraform-backend-secret-key))
+    env:
+      ARM_PROVIDER_TWOPOINTZERO_RESOURCES: "True"  
+
+- name: terraform-kube
+  type: git
+  icon: github-circle
+  source:
+    uri: https://github.com/totr/terraform-kube
+    branch: master
+
+- name: terraform-environments
+  type: git
+  icon: github-circle
+  source:
+    uri: ((env-git-repo-uri))
+    branch: master
+    git_crypt_key: ((terraform-environments-git-crypt-key))
+    private_key: ((terraform-environments-git-private-key))
+
+- name: ansible-playbook
+  type: ansible
+  source:
+    debug: false
+    user: ubuntu
+    ssh_private_key: ""
+    env:
+      ANSIBLE_INVALID_TASK_ATTRIBUTE_FAILED: "False"
+      KUBECONFIG: inventory/local/kubeconfig.yaml
+    # verbose: v
+
+jobs:
+- name: create-k8s-cluster
+  plan:
+    - get: terraform-kube
+    - get: terraform-environments
+    - put: terraform-state
+      params:
+        env_name: ((env-group-name))-((env-name))
+        var_files: [terraform-environments/((env-name)).tfvars]
+        terraform_source: terraform-kube
+  
+- name: deploy-k8s-components
+  plan:
+  - get: terraform-kube
+  - get: terraform-environments
+  - get: terraform-state
+    trigger: true
+    passed: [create-k8s-cluster]
+    params:
+      output_statefile: true
+  - task: create-ansible-inventory
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source: { repository: colstrom/jq }
+      inputs:
+      - name: terraform-state
+      - name: terraform-environments
+      - name: terraform-kube
+      run:
+        path: sh
+        args:
+        - -c
+        - |
+            echo "Environment name: $(cat terraform-state/name)"
+            mkdir -p inventory/local/group_vars
+            cat <<EOT >> inventory/local/hosts.ini
+            [targets]
+            localhost   ansible_connection=local
+            EOT
+            cat terraform-state/metadata | jq .loadbalancer_uuid --raw-output | awk '{print "loadbalancer_uuid: \""$1"\""}' >> inventory/local/group_vars/all.yaml
+            cat terraform-state/metadata | jq .loadbalancer_kubernetes_annotation --raw-output | awk '{print "loadbalancer_kubernetes_annotation: \""$1"\""}' >> inventory/local/group_vars/all.yaml
+            cat terraform-environments/((env-name)).tfvars | grep argocd_admin_password | cut -d'=' -f2 | awk '{print "argocd_admin_password: "$1}' >> inventory/local/group_vars/all.yaml
+            cat terraform-environments/((env-name)).tfvars | grep dns_admin_api_token | cut -d'=' -f2 | awk '{print "dns_admin_api_token: "$1}' >> inventory/local/group_vars/all.yaml
+            cat terraform-state/metadata | jq .kubeconfig --raw-output > inventory/local/kubeconfig.yaml
+            cp -r inventory terraform-kube/k8s-components
+      outputs:
+      - name: terraform-kube
+  - put: run-ansible-playbook
+    resource: ansible-playbook
+    inputs:
+    - terraform-kube
+    params:
+      become: true
+      inventory: inventory/local/hosts.ini
+      playbook: main.yaml
+      vars: {"environment_git_private_key":"((terraform-environments-git-private-key))","environment_git_repo_url":"((env-git-repo-uri))","environment_name":"((env-name))"}
+      path: terraform-kube/k8s-components

@@ -1,0 +1,8 @@
+---
+- name: "rollout status {{ name }}"
+  shell: "kubectl rollout status {{ type }}/{{ name }} -n={{ namespace }}"
+  register: rollout_status_result
+  changed_when: False
+  failed_when: "((rollout_status_result.stdout.find('successfully rolled out') == -1) and (rollout_status_result.stdout.find('rolling update complete') == -1))"
+
+- set_fact: '{{ result_var_name }}={{ rollout_status_result }}'

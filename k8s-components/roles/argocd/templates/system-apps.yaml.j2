@@ -11,8 +11,8 @@ spec:
     server: https://kubernetes.default.svc
   project: system-apps
   source:
-    path: {SYSTEM_APPS_SOURCE_PATH}
-    repoURL: {GIT_REPOSITORY_URL}
+    path: {{ environment_name }}/applications
+    repoURL: {{ environment_git_repo_url }}
     targetRevision: HEAD
     helm:
       valueFiles:

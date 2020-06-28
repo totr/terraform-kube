@@ -3,13 +3,13 @@ resource_types:
   type: docker-image
   source:
     repository: totr/terraform-kube-builder
-    tag: 0.12.18
+    tag: 2.0.0
 
 - name: ansible
   type: docker-image
   source:
     repository: totr/kubespray-builder
-    tag: 2.0.4
+    tag: 2.1.0
 
 - name: kubernetes
   type: docker-image
@@ -56,7 +56,7 @@ resources:
   icon: github-circle
   source:
     uri: https://github.com/totr/terraform-kube
-    branch: feature/digitalocean-flannel
+    branch: master
 
 - name: terraform-environments
   type: git
@@ -193,7 +193,7 @@ jobs:
         type: docker-image
         source:
           repository: totr/kubespray-builder
-          tag: 2.0.4
+          tag: 2.1.0
       platform: linux
       inputs:
       - name: terraform-kube
@@ -213,7 +213,7 @@ jobs:
             cat terraform-kube/k8s-manifests/argocd/system-apps-secret.yaml | sed "s|{SSH_PRIVATE_KEY}|$(cat argocd-config/ssh.key)|g" > argocd-config/system-apps-secret.yaml
             cat terraform-kube/k8s-manifests/argocd/system-apps.yaml | sed 's|{SYSTEM_APPS_SOURCE_PATH}|"((env-name))/applications"|g' > argocd-config/system-apps-tmp.yaml
             cat argocd-config/system-apps-tmp.yaml | sed 's|{GIT_REPOSITORY_URL}|"((env-git-repo-uri))"|g' > argocd-config/system-apps.yaml            
-            cat terraform-kube/k8s-manifests/argocd/update-values-template.yaml | sed "s|{DNS_API_KEY}|$(cat terraform-environments/((env-name)).tfvars | grep dns_api_token | cut -d'=' -f2 | tr -d \ | xargs echo -n | kubeseal --raw --from-file=/dev/stdin --namespace istio-system --name dns-api-key-secret)|g" > argocd-config/update-values.yaml
+            cat terraform-kube/k8s-manifests/argocd/update-values-template.yaml | sed "s|{DNS_API_KEY}|$(cat terraform-environments/((env-name)).tfvars | grep dns_admin_api_token | cut -d'=' -f2 | tr -d \ | xargs echo -n | kubeseal --raw --from-file=/dev/stdin --namespace istio-system --name dns-api-key-secret)|g" > argocd-config/update-values.yaml
             cat argocd-config/update-values.yaml | sed "s|{STORAGE_TOKEN}|$(cat terraform-environments/((env-name)).tfvars | grep provider_client_secret | cut -d'=' -f2 | tr -d \ | xargs echo -n | kubeseal --raw --from-file=/dev/stdin --namespace kube-system --name digitalocean)|g" > argocd-config/update-values.yaml
             cat argocd-config/update-values.yaml | yq w -s - terraform-environments/((env-name))/applications/values.yaml > terraform-environments-secrets/((env-name))/applications/values.yaml
             cp terraform-kube/k8s-manifests/argocd/system-apps-project.yaml argocd-config/system-apps-project.yaml

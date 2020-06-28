@@ -1,0 +1,16 @@
+---
+- name: "create {{ target_dir_path }} directory"
+  file:
+    path: "{{ target_dir_path }}"
+    state: directory
+    recurse: yes
+  changed_when: False
+
+- name: "process {{ source_file_path }} template"
+  local_action:
+    module: template
+    src: "{{ source_file_path }}"
+    dest: "{{ target_dir_path }}/{{ target_file_name }}"
+    force: yes
+    mode: "{{ mode | default('') }}"
+  changed_when: False

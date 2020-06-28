@@ -1,0 +1,64 @@
+---
+- include_role:
+    name: common/kubectl
+    tasks_from: resource-create
+  vars:
+    parameters: "-f {{ sealed_secrets_download_url }}"
+
+- include_role:
+    name: common/kubectl
+    tasks_from: rollout-status
+  vars:
+    name: sealed-secrets-controller
+    type: deployment
+    namespace: kube-system
+    result_var_name: sealed_secrets_status_result
+
+- name: encode dns admin api token
+  shell: "echo -n {{ dns_admin_api_token }} | kubeseal --raw --from-file=/dev/stdin --namespace istio-system --name dns-api-key-secret"
+  register: dns_admin_api_token_encoded
+  changed_when: False
+
+- include_role:
+    name: common/templates
+    tasks_from: process-template
+  vars:
+    target_dir_path: "{{ install_dir }}/sealed-secrets"
+    source_file_path: roles/sealed-secrets/templates/update-secrets-template.yaml.j2
+    target_file_name: update-secrets-template.yaml
+
+- name: prepare git private key
+  shell: "mkdir -p $HOME/.ssh && echo -n '{{ environment_git_private_key }}' > $HOME/.ssh/id_rsa && chmod 600 $HOME/.ssh/id_rsa"
+  changed_when: False
+
+- name: prepare git destination directory
+  shell: "mkdir -p /tmp/environment_repository"
+  changed_when: False
+
+- name: pull environment repository
+  git:
+    repo: "ssh://git@github.com/StratoxEnterprises/codenow-customer-space-tt.git"
+    key_file: "$HOME/.ssh/id_rsa"
+    dest: "/tmp/environment_repository"
+    version: master 
+    
+- name: encode secrets
+  shell: "cat {{ install_dir }}/sealed-secrets/update-secrets-template.yaml | yq w -s - /tmp/environment_repository/{{ environment_name }}/applications/values.yaml > {{ install_dir }}/sealed-secrets/values-with-secrets.yaml"
+  changed_when: False
+ 
+- name: move secrets values to git environment repository
+  shell: "mv -f {{ install_dir }}/sealed-secrets/values-with-secrets.yaml /tmp/environment_repository/{{ environment_name }}/applications/values.yaml"
+  changed_when: False
+
+- name: git commit "Generating secrets"
+  shell: "git config --global user.name 'Concourse CI' && git config --global user.email 'concourse@concourse.ci' && git add . && git commit -m 'Generating secrets'"
+  changed_when: False
+  args:
+    chdir: "/tmp/environment_repository" 
+           
+- name: git push "Generating secrets"
+  shell: "git push "
+  changed_when: True
+  args:
+    chdir: "/tmp/environment_repository"
+           

@@ -30,8 +30,9 @@ services:
 
   concourse-fly:
    image: totr/concourse-fly:5.5.7
+   # TODO fly -t provisioner sp -p custom-k8s-provisioning -c ci/provisioning-custom-k8s-pipeline.yml -n -l ci/credentials.yaml -v env-git-repo-uri=${ENVIRONMENT_GIT_REPO_URI} -v env-group-name=${ENVIRONMENT_GROUP_NAME} -v env-name=${ENVIRONMENT_NAME} \
    command: "sh -c '/wait && fly --target provisioner login -c http://concourse:8080/ -u admin -p admin \
-            && fly -t provisioner sp -p k8s-provisioning -c ci/provisioning-pipeline.yml -n -l ci/credentials.yaml -v env-git-repo-uri=${ENVIRONMENT_GIT_REPO_URI} -v env-group-name=${ENVIRONMENT_GROUP_NAME} -v env-name=${ENVIRONMENT_NAME} \
+            && fly -t provisioner sp -p managed-k8s-provisioning -c ci/provisioning-managed-k8s-pipeline.yml -n -l ci/credentials.yaml -v env-git-repo-uri=${ENVIRONMENT_GIT_REPO_URI} -v env-group-name=${ENVIRONMENT_GROUP_NAME} -v env-name=${ENVIRONMENT_NAME} \
             && fly -t provisioner sp -p k8s-destroying -c ci/destroying-pipeline.yml -n -l ci/credentials.yaml -v env-git-repo-uri=${ENVIRONMENT_GIT_REPO_URI} -v env-group-name=${ENVIRONMENT_GROUP_NAME} -v env-name=${ENVIRONMENT_NAME}'"
    volumes: [".:/ci"]
    depends_on:

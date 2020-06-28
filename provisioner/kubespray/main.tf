@@ -6,7 +6,7 @@ locals {
       public_ip  = i.public_ip
       private_ip = i.private_ip
       #vpn_ip    = lookup(var.vpn_ips, i.private_ip)
-      vpn_ip     = i.private_ip
+      vpn_ip = i.private_ip
     }
   ]
 
@@ -16,7 +16,7 @@ locals {
       public_ip  = i.public_ip
       private_ip = i.private_ip
       #vpn_ip    = lookup(var.vpn_ips, i.private_ip)
-      vpn_ip     = i.private_ip
+      vpn_ip = i.private_ip
     }
   ]
 
@@ -30,7 +30,7 @@ locals {
   cluster_vars = templatefile("${path.module}/templates/k8s-cluster.yaml", {
     #kube_service_addresses = var.kube_service_addresses
     #kube_pods_subnet       = var.kube_pods_subnet
-    kube_network_plugin    = var.kube_network_plugin
+    kube_network_plugin = var.kube_network_plugin
   })
 
   addons_vars = templatefile("${path.module}/templates/addons.yaml", {

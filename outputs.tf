@@ -1,27 +1,15 @@
-output "ssh_private_key" {
-  value = module.provider.ssh_private_key
+output "loadbalancer_ip" {
+  value = module.provider.loadbalancer_ip
 }
 
-output "admin_user" {
-  value = module.provider.admin_user
+output "loadbalancer_uuid" {
+  value = module.provider.loadbalancer_uuid
 }
 
-output "master_nodes" {
-  value = module.provider.master_nodes
+output "loadbalancer_kubernetes_annotation" {
+  value = module.provider.loadbalancer_kubernetes_annotation
 }
 
-output "worker_nodes" {
-  value = module.provider.worker_nodes
-}
-
-output "kubespray_inventory" {
-  value = module.provisioner.inventory
-}
-
-output "kubespray_cluster_vars" {
-  value = module.provisioner.cluster_vars
-}
-
-output "kubespray_addons_vars" {
-  value = module.provisioner.addons_vars
+output "kubeconfig" {
+  value = module.provider.kubeconfig
 }

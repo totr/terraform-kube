@@ -9,7 +9,7 @@ metadata:
 data:
   repositories: |
     - type: git
-      url: {GIT_REPOSITORY_URL}
+      url: {{ environment_git_repo_url }}
       name: system-apps
       sshPrivateKeySecret:
         key: sshPrivateKey
@@ -19,3 +19,12 @@ data:
       ignoreDifferences: |
         jsonPointers:
         - /webhooks/0/clientConfig/caBundle
+    admissionregistration.k8s.io/ValidatingWebhookConfiguration:
+      ignoreDifferences: |
+        jsonPointers:
+        - /webhooks/0/clientConfig/caBundle
+        - /webhooks/0/failurePolicy
+    bitnami.com/SealedSecret:
+      ignoreDifferences: |
+        jsonPointers:
+        - /status

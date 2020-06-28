@@ -1,4 +1,4 @@
-variable "dns_ip" {
+variable "ip_address" {
   type = string
 }
 
@@ -6,7 +6,7 @@ variable "domain" {
   type = string
 }
 
-variable "email" {
+variable "admin_email" {
   type = string
 }
 

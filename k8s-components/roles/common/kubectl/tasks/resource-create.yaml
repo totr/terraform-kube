@@ -1,0 +1,6 @@
+---
+- name: "create {{ parameters }}"
+  shell: "kubectl create {{ parameters }}"
+  register: result
+  changed_when: "'created' in result.stdout"
+  failed_when: "result.rc != 0 and 'already exists' not in result.stderr"
