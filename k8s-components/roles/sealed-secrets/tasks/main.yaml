@@ -37,7 +37,7 @@
 
 - name: pull environment repository
   git:
-    repo: "ssh://git@github.com/StratoxEnterprises/codenow-customer-space-tt.git"
+    repo: "ssh://{{ environment_git_repo_url }}"
     key_file: "$HOME/.ssh/id_rsa"
     dest: "/tmp/environment_repository"
     version: master 
