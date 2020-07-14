@@ -22,7 +22,12 @@ variable provider_server_master_type {
   default = ""
 }
 
-variable provider_server_worker_type {
+variable provider_worker_node_type {
+  type    = string
+  default = ""
+}
+
+variable provider_worker_infra_node_type {
   type    = string
   default = ""
 }
@@ -43,12 +48,12 @@ variable "dns_admin_api_token" {
   type = string
 }
 
-variable "master_nodes_count" {
+variable "provider_master_nodes_count" {
   type    = string
   default = "1"
 }
 
-variable "worker_nodes_count" {
+variable "provider_worker_nodes_count" {
   type    = string
   default = "2"
 }
