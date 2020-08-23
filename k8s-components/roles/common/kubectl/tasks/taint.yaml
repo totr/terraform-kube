@@ -1,0 +1,6 @@
+---
+- name: "taint {{ parameters }}"
+  shell: "kubectl taint {{ parameters }}"
+  register: result
+  changed_when: "'tainted' in result.stdout"
+  failed_when: "result.rc != 0 and 'already has' not in result.stderr"

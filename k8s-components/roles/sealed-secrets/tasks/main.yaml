@@ -7,6 +7,16 @@
 
 - include_role:
     name: common/kubectl
+    tasks_from: resource-patch
+  vars:
+    namespace: kube-system
+    type: deployment
+    name: sealed-secrets-controller
+    patch_parameters: ""
+    patch: '{"spec":{"template":{"spec":{"affinity":{"nodeAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":{"nodeSelectorTerms":[{"matchExpressions":[{"key":"service","operator":"In","values":["system"]}]}]}}},"tolerations":[{"key":"system-app","operator":"Equal","value":"false","effect":"NoExecute"}]}}}}'
+
+- include_role:
+    name: common/kubectl
     tasks_from: rollout-status
   vars:
     name: sealed-secrets-controller

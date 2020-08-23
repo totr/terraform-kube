@@ -3,3 +3,4 @@
   shell: "kubectl delete {{ type }} {{ name }} --namespace {{ namespace }}"
   register: result
   changed_when: "'deleted' in result.stdout"
+  failed_when: "result.rc != 0 and '(NotFound)' not in result.stderr"

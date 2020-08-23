@@ -12,6 +12,65 @@
     parameters: "-n {{ argocd_namespace }} -f {{ argocd_download_url }}"
 
 - include_role:
+    name: common/kubectl
+    tasks_from: resource-patch
+  vars:
+    namespace: "{{ argocd_namespace }}"
+    type: statefulset
+    name: argocd-redis-ha-server
+    patch_parameters: ""
+    patch: '{"spec":{"template":{"spec":{"affinity":{"nodeAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":{"nodeSelectorTerms":[{"matchExpressions":[{"key":"service","operator":"In","values":["system"]}]}]}}},"tolerations":[{"key":"system-app","operator":"Equal","value":"false","effect":"NoExecute"}]}}}}'
+
+
+- include_role:
+    name: common/kubectl
+    tasks_from: resource-patch
+  vars:
+    namespace: "{{ argocd_namespace }}"
+    type: deployment
+    name: argocd-application-controller 
+    patch_parameters: ""
+    patch: '{"spec":{"template":{"spec":{"affinity":{"nodeAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":{"nodeSelectorTerms":[{"matchExpressions":[{"key":"service","operator":"In","values":["system"]}]}]}}},"tolerations":[{"key":"system-app","operator":"Equal","value":"false","effect":"NoExecute"}]}}}}'
+
+- include_role:
+    name: common/kubectl
+    tasks_from: resource-patch
+  vars:
+    namespace: "{{ argocd_namespace }}"
+    type: deployment
+    name: argocd-redis-ha-haproxy
+    patch_parameters: ""
+    patch: '{"spec":{"template":{"spec":{"affinity":{"nodeAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":{"nodeSelectorTerms":[{"matchExpressions":[{"key":"service","operator":"In","values":["system"]}]}]}}},"tolerations":[{"key":"system-app","operator":"Equal","value":"false","effect":"NoExecute"}]}}}}'
+
+- include_role:
+    name: common/kubectl
+    tasks_from: resource-patch
+  vars:
+    namespace: "{{ argocd_namespace }}"
+    type: deployment
+    name: argocd-repo-server
+    patch_parameters: ""
+    patch: '{"spec":{"template":{"spec":{"affinity":{"nodeAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":{"nodeSelectorTerms":[{"matchExpressions":[{"key":"service","operator":"In","values":["system"]}]}]}}},"tolerations":[{"key":"system-app","operator":"Equal","value":"false","effect":"NoExecute"}]}}}}'
+
+- include_role:
+    name: common/kubectl
+    tasks_from: resource-patch
+  vars:
+    namespace: "{{ argocd_namespace }}"
+    type: deployment
+    name: argocd-server
+    patch_parameters: ""
+    patch: '{"spec":{"template":{"spec":{"affinity":{"nodeAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":{"nodeSelectorTerms":[{"matchExpressions":[{"key":"service","operator":"In","values":["system"]}]}]}}},"tolerations":[{"key":"system-app","operator":"Equal","value":"false","effect":"NoExecute"}]}}}}'
+
+- include_role:
+    name: common/kubectl
+    tasks_from: resource-delete
+  vars:
+    namespace: "{{ argocd_namespace }}"
+    type: deployment
+    name: argocd-dex-server
+
+- include_role:
     name: common/templates
     tasks_from: process-template
   vars:

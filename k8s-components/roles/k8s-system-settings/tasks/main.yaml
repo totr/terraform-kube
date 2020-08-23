@@ -1,0 +1,6 @@
+---
+- include_role:
+    name: common/kubectl
+    tasks_from: taint
+  vars:
+    parameters: "node -l service=system system-app=false:NoExecute"

@@ -1,5 +1,5 @@
 provider "digitalocean" {
-  version = "~> 1.20"
+  version = "~> 1.22"
   token   = var.provider_client_secret
 }
 
@@ -27,18 +27,18 @@ resource "digitalocean_kubernetes_cluster" "default" {
   }
 }
 
-resource "digitalocean_kubernetes_node_pool" "infra_pool" {
+resource "digitalocean_kubernetes_node_pool" "system_pool" {
   cluster_id = digitalocean_kubernetes_cluster.default.id
 
-  name       = "infra-pool"
-  size       = var.provider_worker_infra_node_type
-  min_nodes  = var.provider_worker_infra_nodes_count_min
-  max_nodes  = var.provider_worker_infra_nodes_count_max
-  tags       = ["infra", var.project_name]
+  name       = "system-pool"
+  size       = var.provider_worker_system_node_type
+  min_nodes  = var.provider_worker_system_nodes_count_min
+  max_nodes  = var.provider_worker_system_nodes_count_max
+  tags       = ["system", var.project_name]
   auto_scale = true
 
   labels = {
-    service  = "infra"
+    service  = "system"
     priority = "high"
   }
 }
@@ -49,6 +49,7 @@ resource "digitalocean_loadbalancer" "public" {
   droplet_tag = var.project_name
   vpc_uuid    = digitalocean_vpc.default.id
 
+  # default port
   forwarding_rule {
     entry_port      = 80
     entry_protocol  = "tcp"

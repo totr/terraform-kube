@@ -52,7 +52,7 @@ module "provider" {
   provider_client_secret          = var.provider_client_secret
   provider_worker_node_type       = var.provider_worker_node_type
   provider_worker_nodes_count     = var.provider_worker_nodes_count
-  provider_worker_infra_node_type = var.provider_worker_infra_node_type
+  provider_worker_system_node_type = var.provider_worker_system_node_type
 }
 
 #module "provider" {

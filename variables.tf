@@ -27,7 +27,7 @@ variable provider_worker_node_type {
   default = ""
 }
 
-variable provider_worker_infra_node_type {
+variable provider_worker_system_node_type {
   type    = string
   default = ""
 }
