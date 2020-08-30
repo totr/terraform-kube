@@ -1,13 +1,5 @@
-output "loadbalancer_ip" {
-  value = module.provider.loadbalancer_ip
-}
-
-output "loadbalancer_uuid" {
-  value = module.provider.loadbalancer_uuid
-}
-
-output "loadbalancer_kubernetes_annotation" {
-  value = module.provider.loadbalancer_kubernetes_annotation
+output "loadbalancer_kubernetes_annotations" {
+  value = module.provider.loadbalancer_kubernetes_annotations
 }
 
 output "kubeconfig" {

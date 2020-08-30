@@ -1,0 +1,39 @@
+---
+- include_role:
+    name: common/git
+    tasks_from: pull
+  vars:
+    repository_url: "{{ environment_git_repo_url }}"
+    private_key: "{{ environment_git_private_key }}"
+    branch: "master"
+    working_directory: "/tmp/environment_repository" 
+
+- include_role:
+    name: common/templates
+    tasks_from: process-template
+  vars:
+    target_dir_path: "{{ install_dir }}/loadbalancer"
+    source_file_path: roles/loadbalancer/templates/loadbalancer-annotations.yaml.j2
+    target_file_name: loadbalancer-annotations.yaml
+
+- name: loadbalancer annotations
+  shell: "yq m /tmp/environment_repository/{{ environment_name }}/applications/values.yaml {{ install_dir }}/loadbalancer/loadbalancer-annotations.yaml > {{ install_dir }}/loadbalancer/values.yaml"
+  changed_when: False
+
+- name: move values to git environment repository
+  shell: "mv -f {{ install_dir }}/loadbalancer/values.yaml /tmp/environment_repository/{{ environment_name }}/applications/values.yaml"
+  changed_when: False
+
+- include_role:
+    name: common/git
+    tasks_from: commit
+  vars:
+    message: "Added LoadBalancer configuration"
+    working_directory: "/tmp/environment_repository" 
+
+- include_role:
+    name: common/git
+    tasks_from: push
+  vars:
+    working_directory: "/tmp/environment_repository" 
+           

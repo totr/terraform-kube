@@ -13,5 +13,6 @@
       run_once: yes
 
   roles:
+    - {role: 'loadbalancer'}
     - {role: 'sealed-secrets'}
     - {role: 'argocd'}

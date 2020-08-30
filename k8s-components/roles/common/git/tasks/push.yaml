@@ -1,0 +1,6 @@
+---
+- name: git push
+  shell: "git push"
+  changed_when: True
+  args:
+    chdir: "{{ working_directory }}"

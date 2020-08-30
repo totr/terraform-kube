@@ -1,0 +1,16 @@
+---
+- name: prepare git private key
+  shell: "mkdir -p $HOME/.ssh && echo -n '{{ private_key }}' > $HOME/.ssh/id_rsa && chmod 600 $HOME/.ssh/id_rsa"
+  changed_when: False
+
+- name: prepare git destination directory
+  shell: "mkdir -p {{ working_directory }}"
+  changed_when: False
+
+- name: "git pull {{ repository_url }}"
+  git:
+    repo: "ssh://{{ repository_url | replace(':','/') }}"
+    key_file: "$HOME/.ssh/id_rsa"
+    dest: "{{ working_directory }}"
+    version: "{{ branch }}"
+    

@@ -21,7 +21,6 @@
     patch_parameters: ""
     patch: '{"spec":{"template":{"spec":{"affinity":{"nodeAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":{"nodeSelectorTerms":[{"matchExpressions":[{"key":"service","operator":"In","values":["system"]}]}]}}},"tolerations":[{"key":"system-app","operator":"Equal","value":"false","effect":"NoExecute"}]}}}}'
 
-
 - include_role:
     name: common/kubectl
     tasks_from: resource-patch
@@ -167,3 +166,5 @@
     tasks_from: resource-create
   vars:
     parameters: "-n {{ argocd_namespace }} -f {{ install_dir }}/argocd/system-apps.yaml"
+
+- include_tasks: sync-apps.yaml

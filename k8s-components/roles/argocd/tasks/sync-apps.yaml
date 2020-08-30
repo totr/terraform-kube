@@ -1,0 +1,24 @@
+ - name: wait for system-apps startup
+   shell: kubectl get applications -n {{ argocd_namespace }} system-apps
+   register: system_app_result
+   until: system_app_result.rc == 0
+   retries: 10
+   delay: 10
+   ignore_errors: yes
+ 
+ - name: argocd get server pod
+   shell: "echo $(kubectl get pods -n {{ argocd_namespace }} --field-selector=status.phase=Running -l app.kubernetes.io/name=argocd-server --output=jsonpath={.items..metadata.name}) | cut -d' ' -f1"
+   register: argocd_server_pod
+   changed_when: False
+
+ - name: argocd login
+   shell: "kubectl exec -n {{ argocd_namespace }} {{ argocd_server_pod.stdout }} -- argocd login localhost:8080 --plaintext --username admin --password {{ argocd_admin_password }}"
+   changed_when: False
+
+ - name: argocd sync system-apps
+   shell: "kubectl exec -n {{ argocd_namespace }} {{ argocd_server_pod.stdout }} -- argocd app sync -l app.kubernetes.io/part-of=system-apps"
+   changed_when: False
+
+ - name: argocd waiting for system-apps
+   shell: "kubectl exec -n {{ argocd_namespace }} {{ argocd_server_pod.stdout }} -- argocd app wait -l app.kubernetes.io/part-of=system-apps"
+   changed_when: False

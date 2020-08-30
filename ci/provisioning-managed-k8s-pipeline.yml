@@ -99,8 +99,8 @@ jobs:
             [targets]
             localhost   ansible_connection=local
             EOT
-            cat terraform-state/metadata | jq .loadbalancer_uuid --raw-output | awk '{print "loadbalancer_uuid: \""$1"\""}' >> inventory/local/group_vars/all.yaml
-            cat terraform-state/metadata | jq .loadbalancer_kubernetes_annotation --raw-output | awk '{print "loadbalancer_kubernetes_annotation: \""$1"\""}' >> inventory/local/group_vars/all.yaml
+            echo "loadbalancer_kubernetes_annotations:" >> inventory/local/group_vars/all.yaml
+            cat terraform-state/metadata | jq .loadbalancer_kubernetes_annotations --indent 2 --raw-output | tr -d '"{},' | tail -n +2 >> inventory/local/group_vars/all.yaml
             cat terraform-environments/((env-name)).tfvars | grep argocd_admin_password | cut -d'=' -f2 | awk '{print "argocd_admin_password: "$1}' >> inventory/local/group_vars/all.yaml
             cat terraform-environments/((env-name)).tfvars | grep dns_admin_api_token | cut -d'=' -f2 | awk '{print "dns_admin_api_token: "$1}' >> inventory/local/group_vars/all.yaml
             cat terraform-state/metadata | jq .kubeconfig --raw-output > inventory/local/kubeconfig.yaml

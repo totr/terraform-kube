@@ -1,0 +1,6 @@
+---
+- name: "git commit {{ message }}"
+  shell: "git config --global user.name 'Concourse CI' && git config --global user.email 'concourse@concourse.ci' && git add . && git commit --allow-empty -m '{{ message }}'"
+  changed_when: False
+  args:
+    chdir: "{{ working_directory }}" 

@@ -49,12 +49,30 @@ resource "digitalocean_loadbalancer" "public" {
   droplet_tag = var.project_name
   vpc_uuid    = digitalocean_vpc.default.id
 
-  # default port
   forwarding_rule {
     entry_port      = 80
     entry_protocol  = "tcp"
-    target_port     = 80
+    target_port     = 30080
     target_protocol = "tcp"
+  }
+
+  forwarding_rule {
+    entry_port      = 443
+    entry_protocol  = "tcp"
+    target_port     = 30443
+    target_protocol = "tcp"
+  }
+
+  forwarding_rule {
+    entry_port      = 22
+    entry_protocol  = "tcp"
+    target_port     = 30022
+    target_protocol = "tcp"
+  }
+
+  healthcheck {
+    port     = 30020
+    protocol = "tcp"
   }
 
 }
