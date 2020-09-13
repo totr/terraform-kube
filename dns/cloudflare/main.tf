@@ -17,6 +17,14 @@ data "cloudflare_zones" "domain_zones" {
   }
 }
 
+data "http" "cloudflare_ip4_addrs" {
+  url = "https://www.cloudflare.com/ips-v4"
+}
+
+data "http" "cloudflare_ip6_addrs" {
+  url = "https://www.cloudflare.com/ips-v6"
+}
+
 resource "cloudflare_record" "domain" {
   zone_id = local.zone_id
   name    = var.domain

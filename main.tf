@@ -98,6 +98,14 @@ module "provider" {
 #  lb_forwarding_target_ssh_port    = var.lb_forwarding_target_ssh_port
 #}
 
+module "firewall" {
+  source = "./security/digitalocean"
+
+  project_name           = var.project_name
+  provider_client_secret = var.provider_client_secret
+  dns_servers_ips        = module.dns.dns_servers_ips
+}
+
 module "dns" {
   source = "./dns/cloudflare"
 
