@@ -103,7 +103,7 @@ module "dns" {
 
   ip_address  = module.provider.loadbalancer_ip
   domain      = var.domain
-  admin_email = var.email
+  admin_email = var.dns_admin_email
   api_token   = var.dns_admin_api_token
 }
 

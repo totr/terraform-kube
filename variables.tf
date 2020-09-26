@@ -40,7 +40,7 @@ variable "domain" {
   type = string
 }
 
-variable "email" {
+variable "dns_admin_email" {
   type = string
 }
 
