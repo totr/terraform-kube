@@ -2,6 +2,10 @@ variable "ip_address" {
   type = string
 }
 
+variable "root_domain" {
+  type = string
+}
+
 variable "domain" {
   type = string
 }
