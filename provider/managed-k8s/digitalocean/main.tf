@@ -1,6 +1,5 @@
 provider "digitalocean" {
-  version = "~> 1.22"
-  token   = var.provider_client_secret
+  token = var.provider_client_secret
 }
 
 resource "digitalocean_project" "main" {

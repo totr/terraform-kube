@@ -4,7 +4,6 @@ locals {
 }
 
 provider "cloudflare" {
-  version = "~> 2.3"
   email   = var.admin_email
   api_key = var.api_token
 }

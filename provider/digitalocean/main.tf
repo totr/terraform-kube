@@ -1,6 +1,5 @@
 provider "digitalocean" {
-  version = "~> 1.20"
-  token   = var.provider_client_secret
+  token = var.provider_client_secret
 }
 
 locals {
