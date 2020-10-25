@@ -22,3 +22,7 @@
  - name: argocd waiting for system-apps
    shell: "kubectl exec -n {{ argocd_namespace }} {{ argocd_server_pod.stdout }} -- argocd app wait -l app.kubernetes.io/part-of=system-apps"
    changed_when: False
+
+ - name: enable autosync for system-apps
+   shell: "kubectl exec -n {{ argocd_namespace }} {{ argocd_server_pod.stdout }} -- argocd app set system-apps --sync-policy automated --self-heal --auto-prune"
+   changed_when: False
