@@ -8,7 +8,7 @@ variable "provider_client_secret" {
 
 variable "provider_k8s_version" {
   type    = string
-  default = "1.18.8-do.1"
+  default = "1.18.10-do.0"
 }
 
 variable "provider_region" {
