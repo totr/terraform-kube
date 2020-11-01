@@ -10,6 +10,11 @@ resource "digitalocean_project" "main" {
 resource "digitalocean_vpc" "default" {
   name   = format("%s-%s", var.project_name, "network")
   region = var.provider_region
+
+  # see https://github.com/digitalocean/terraform-provider-digitalocean/issues/488
+  timeouts {
+    delete = "10m"
+  }
 }
 
 resource "digitalocean_kubernetes_cluster" "default" {

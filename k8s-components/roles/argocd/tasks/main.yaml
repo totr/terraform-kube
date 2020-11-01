@@ -16,10 +16,38 @@
     tasks_from: resource-patch
   vars:
     namespace: "{{ argocd_namespace }}"
+    type: deployment
+    name: argocd-redis-ha-haproxy
+    patch_parameters: ""
+    patch: '{"spec":{"template":{"spec":{"affinity":{"nodeAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":{"nodeSelectorTerms":[{"matchExpressions":[{"key":"service","operator":"In","values":["system"]}]}]}}},"tolerations":[{"key":"system-app","operator":"Equal","value":"false","effect":"NoExecute"}]}}}}'
+
+- include_role:
+    name: common/kubectl
+    tasks_from: rollout-status
+  vars:
+    name: argocd-redis-ha-haproxy
+    type: deployment
+    namespace: "{{ argocd_namespace }}"
+    result_var_name: argocd_status_result
+
+- include_role:
+    name: common/kubectl
+    tasks_from: resource-patch
+  vars:
+    namespace: "{{ argocd_namespace }}"
     type: statefulset
     name: argocd-redis-ha-server
     patch_parameters: ""
     patch: '{"spec":{"template":{"spec":{"affinity":{"nodeAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":{"nodeSelectorTerms":[{"matchExpressions":[{"key":"service","operator":"In","values":["system"]}]}]}}},"tolerations":[{"key":"system-app","operator":"Equal","value":"false","effect":"NoExecute"}]}}}}'
+
+- include_role:
+    name: common/kubectl
+    tasks_from: rollout-status
+  vars:
+    name: argocd-redis-ha-server
+    type: statefulset
+    namespace: "{{ argocd_namespace }}"
+    result_var_name: argocd_status_result
 
 - include_role:
     name: common/kubectl
@@ -33,13 +61,12 @@
 
 - include_role:
     name: common/kubectl
-    tasks_from: resource-patch
+    tasks_from: rollout-status
   vars:
-    namespace: "{{ argocd_namespace }}"
+    name: argocd-application-controller 
     type: deployment
-    name: argocd-redis-ha-haproxy
-    patch_parameters: ""
-    patch: '{"spec":{"template":{"spec":{"affinity":{"nodeAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":{"nodeSelectorTerms":[{"matchExpressions":[{"key":"service","operator":"In","values":["system"]}]}]}}},"tolerations":[{"key":"system-app","operator":"Equal","value":"false","effect":"NoExecute"}]}}}}'
+    namespace: "{{ argocd_namespace }}"
+    result_var_name: argocd_status_result
 
 - include_role:
     name: common/kubectl
@@ -50,6 +77,15 @@
     name: argocd-repo-server
     patch_parameters: ""
     patch: '{"spec":{"template":{"spec":{"affinity":{"nodeAffinity":{"requiredDuringSchedulingIgnoredDuringExecution":{"nodeSelectorTerms":[{"matchExpressions":[{"key":"service","operator":"In","values":["system"]}]}]}}},"tolerations":[{"key":"system-app","operator":"Equal","value":"false","effect":"NoExecute"}]}}}}'
+
+- include_role:
+    name: common/kubectl
+    tasks_from: rollout-status
+  vars:
+    name: argocd-repo-server
+    type: deployment
+    namespace: "{{ argocd_namespace }}"
+    result_var_name: argocd_status_result
 
 - include_role:
     name: common/kubectl
@@ -140,7 +176,7 @@
     name: common/kubectl
     tasks_from: resource-delete
   vars:
-    name: "-l app.kubernetes.io/name=argocd-server"
+    name: "--all"
     type: pods
     namespace: "{{ argocd_namespace }}"
 
