@@ -2,10 +2,18 @@
    shell: kubectl get applications -n {{ argocd_namespace }} system-apps
    register: system_app_result
    until: system_app_result.rc == 0
-   retries: 10
+   retries: 12
    delay: 10
    ignore_errors: yes
- 
+
+ - name: wait for argocd server become ready
+   shell: "kubectl wait --timeout=240s --for=condition=Available -n {{ argocd_namespace }} deployment/argocd-server"
+   changed_when: False
+
+ - name: wait 30 seconds for the deletion of pods that are terminating state
+   pause:
+     seconds: 30
+
  - name: argocd get server pod
    shell: "echo $(kubectl get pods -n {{ argocd_namespace }} --field-selector=status.phase=Running -l app.kubernetes.io/name=argocd-server --output=jsonpath={.items..metadata.name}) | cut -d' ' -f1"
    register: argocd_server_pod
