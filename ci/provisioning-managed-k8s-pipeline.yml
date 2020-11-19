@@ -36,7 +36,7 @@ resources:
   icon: github-circle
   source:
     uri: https://github.com/totr/terraform-kube
-    branch: master
+    branch: feature/without-dns
 
 - name: terraform-environments
   type: git

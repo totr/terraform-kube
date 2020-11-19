@@ -98,15 +98,15 @@ module "provider" {
 #  lb_forwarding_target_ssh_port    = var.lb_forwarding_target_ssh_port
 #}
 
-module "dns" {
-  source = "./dns/cloudflare"
+# module "dns" {
+#  source = "./dns/cloudflare"
 
-  ip_address  = module.provider.loadbalancer_ip
-  domain      = var.domain
-  root_domain = var.root_domain
-  admin_email = var.dns_admin_email
-  api_token   = var.dns_admin_api_token
-}
+#  ip_address  = module.provider.loadbalancer_ip
+#  domain      = var.domain
+#  root_domain = var.root_domain
+#  admin_email = var.dns_admin_email
+#  api_token   = var.dns_admin_api_token
+#}
 
 # module "provisioner" {
 #  source = "./provisioner/kubespray"
