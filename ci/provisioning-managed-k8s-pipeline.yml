@@ -2,7 +2,7 @@ resource_types:
 - name: terraform
   type: docker-image
   source:
-    repository: totr/terraform-kube-builder
+    repository: docker.io/totr/terraform-kube-builder
     username: ((docker-hub-username))
     password: ((docker-hub-password))
     tag: 3.0.0
@@ -10,7 +10,7 @@ resource_types:
 - name: ansible
   type: docker-image
   source:
-    repository: totr/kubespray-builder
+    repository: docker.io/totr/kubespray-builder
     username: ((docker-hub-username))
     password: ((docker-hub-password))
     tag: 2.1.0
