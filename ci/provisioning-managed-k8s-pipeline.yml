@@ -1,6 +1,6 @@
 resource_types:
 - name: terraform
-  type: docker-image
+  type: registry-image
   source:
     repository: docker.io/totr/terraform-kube-builder
     username: ((docker-hub-username))
@@ -8,7 +8,7 @@ resource_types:
     tag: 3.0.0
 
 - name: ansible
-  type: docker-image
+  type: registry-image
   source:
     repository: docker.io/totr/kubespray-builder
     username: ((docker-hub-username))

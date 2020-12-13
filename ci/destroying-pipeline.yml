@@ -1,6 +1,6 @@
 resource_types:
 - name: terraform
-  type: docker-image
+  type: registry-image
   source:
     repository: docker.io/totr/terraform-kube-builder
     username: ((docker-hub-username))
