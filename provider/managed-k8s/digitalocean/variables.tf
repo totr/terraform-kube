@@ -33,7 +33,7 @@ variable "provider_worker_system_node_type" {
 
 variable "provider_worker_system_nodes_count_min" {
   type    = string
-  default = "2"
+  default = "3"
 }
 
 variable "provider_worker_system_nodes_count_max" {
