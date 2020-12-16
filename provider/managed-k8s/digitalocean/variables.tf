@@ -31,12 +31,7 @@ variable "provider_worker_system_node_type" {
   default = "g-2vcpu-8gb"
 }
 
-variable "provider_worker_system_nodes_count_min" {
-  type    = string
-  default = "3"
-}
-
-variable "provider_worker_system_nodes_count_max" {
+variable "provider_worker_system_nodes_count" {
   type    = string
   default = "3"
 }
