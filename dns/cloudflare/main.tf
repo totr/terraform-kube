@@ -18,7 +18,7 @@ data "cloudflare_zones" "domain_zones" {
 
 resource "cloudflare_record" "wildcard_domain" {
   zone_id = local.zone_id
-  name    = format("%s.%s", "*", var.domain)
+  name    = var.a_domain
   value   = var.ip_address
   type    = "A"
   proxied = false
@@ -28,7 +28,7 @@ resource "cloudflare_record" "domain" {
   depends_on = [cloudflare_record.domain]
 
   zone_id = local.zone_id
-  name    = var.domain
+  name    = var.cname_domain
   value   = var.root_domain
   type    = "CNAME"
   proxied = true
