@@ -102,7 +102,8 @@ module "dns" {
   source = "./dns/cloudflare"
 
   ip_address  = module.provider.loadbalancer_ip
-  domain      = var.domain
+  a_domain      = var.a_domain
+  cname_domain  = var.cname_domain
   root_domain = var.root_domain
   admin_email = var.dns_admin_email
   api_token   = var.dns_admin_api_token
