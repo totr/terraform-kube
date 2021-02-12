@@ -40,7 +40,7 @@ resources:
   icon: github-circle
   source:
     uri: https://github.com/StratoxEnterprises/terraform-kube
-    branch: v1.0.16
+    branch: v1.0.17
 
 - name: terraform-environments
   type: git
