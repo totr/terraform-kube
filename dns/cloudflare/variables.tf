@@ -6,7 +6,11 @@ variable "root_domain" {
   type = string
 }
 
-variable "domain" {
+variable "a_domain" {
+  type = string
+}
+
+variable "cname_domain" {
   type = string
 }
 
