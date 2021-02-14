@@ -34,10 +34,10 @@ resource "digitalocean_kubernetes_cluster" "default" {
 resource "digitalocean_kubernetes_node_pool" "system_pool" {
   cluster_id = digitalocean_kubernetes_cluster.default.id
 
-  name        = "system-pool"
-  size        = var.provider_worker_system_node_type
-  node_count  = var.provider_worker_system_nodes_count
-  tags        = ["system", var.project_name]
+  name       = "system-pool"
+  size       = var.provider_worker_system_node_type
+  node_count = var.provider_worker_system_nodes_count
+  tags       = ["system", var.project_name]
 
   labels = {
     service  = "system"
