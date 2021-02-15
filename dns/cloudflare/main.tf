@@ -31,5 +31,5 @@ resource "cloudflare_record" "domain" {
   name    = var.cname_domain
   value   = var.root_domain
   type    = "CNAME"
-  proxied = true
+  proxied = false
 }
