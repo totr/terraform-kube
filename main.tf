@@ -54,6 +54,7 @@ module "provider" {
   provider_worker_node_type        = var.provider_worker_node_type
   provider_worker_nodes_count      = var.provider_worker_nodes_count
   provider_worker_system_node_type = var.provider_worker_system_node_type
+  default_box                      = var.default_box
 }
 
 #module "provider" {
@@ -108,6 +109,7 @@ module "dns" {
   root_domain = var.root_domain
   admin_email = var.dns_admin_email
   api_token   = var.dns_admin_api_token
+  default_box = var.default_box
 }
 
 # module "provisioner" {

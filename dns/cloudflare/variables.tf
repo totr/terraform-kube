@@ -22,3 +22,7 @@ variable "api_token" {
   type = string
 }
 
+variable "default_box"{
+  type = bool
+}
+

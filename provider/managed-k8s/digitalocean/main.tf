@@ -3,11 +3,13 @@ provider "digitalocean" {
 }
 
 resource "digitalocean_project" "main" {
+  count = var.default_box ? 1 : 0
   name      = var.project_name
   resources = list(digitalocean_loadbalancer.public.urn)
 }
 
 resource "digitalocean_vpc" "default" {
+  count = var.default_box ? 1 : 0
   name   = format("%s-%s", var.project_name, "network")
   region = var.provider_region
 

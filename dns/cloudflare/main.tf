@@ -25,6 +25,7 @@ resource "cloudflare_record" "wildcard_domain" {
 }
 
 resource "cloudflare_record" "domain" {
+  count = var.default_box ? 1 : 0
   depends_on = [cloudflare_record.domain]
 
   zone_id = local.zone_id

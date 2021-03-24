@@ -6,6 +6,10 @@ variable "cluster_name" {
   type = string
 }
 
+variable "default_box"{
+  type = bool
+}
+
 variable "provider_client_secret" {
   type = string
 }

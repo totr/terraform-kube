@@ -36,6 +36,10 @@ variable "project_name" {
   type = string
 }
 
+variable "default_box"{
+  type = bool
+}
+
 variable "cluster_name" {
   type = string
 }
