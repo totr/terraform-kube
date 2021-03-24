@@ -36,6 +36,10 @@ variable "project_name" {
   type = string
 }
 
+variable "cluster_name" {
+  type = string
+}
+
 variable "root_domain" {
   type = string
 }
