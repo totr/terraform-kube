@@ -49,6 +49,7 @@ module "provider" {
   source = "./provider/managed-k8s/digitalocean"
 
   project_name                     = var.project_name
+  cluster_name                     = var.cluster_name
   provider_client_secret           = var.provider_client_secret
   provider_worker_node_type        = var.provider_worker_node_type
   provider_worker_nodes_count      = var.provider_worker_nodes_count
