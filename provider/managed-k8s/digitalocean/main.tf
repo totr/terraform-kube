@@ -31,7 +31,7 @@ resource "digitalocean_kubernetes_cluster" "default" {
 
   node_pool {
     name       = "application-pool"
-    tags       = ["app", var.project_name]
+    tags       = ["app", format("%s-%s", var.project_name, var.cluster_name)]
     size       = var.provider_worker_node_type
     node_count = var.provider_worker_nodes_count
   }
@@ -43,7 +43,7 @@ resource "digitalocean_kubernetes_node_pool" "system_pool" {
   name        = "system-pool"
   size        = var.provider_worker_system_node_type
   node_count  = var.provider_worker_system_nodes_count
-  tags        = ["system", var.project_name]
+  tags        = ["system", format("%s-%s", var.project_name, var.cluster_name)]
 
   labels = {
     service  = "system"
@@ -54,7 +54,7 @@ resource "digitalocean_kubernetes_node_pool" "system_pool" {
 resource "digitalocean_loadbalancer" "public" {
   name        = format("%s-%s-%s", var.project_name, var.cluster_name, "load-balancer")
   region      = var.provider_region
-  droplet_tag = var.project_name
+  droplet_tag = format("%s-%s", var.project_name, var.cluster_name)
   vpc_uuid    = data.digitalocean_vpc.get.id
 
   forwarding_rule {
