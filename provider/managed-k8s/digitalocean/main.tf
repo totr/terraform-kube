@@ -19,11 +19,15 @@ resource "digitalocean_vpc" "default" {
   }
 }
 
+data "digitalocean_vpc" "get" {
+  name   = format("%s-%s", var.project_name, "network")
+}
+
 resource "digitalocean_kubernetes_cluster" "default" {
   name     = format("%s-%s", var.project_name, var.cluster_name)
   region   = var.provider_region
   version  = var.provider_k8s_version
-  vpc_uuid = digitalocean_vpc.default.id
+  vpc_uuid = digitalocean_vpc.get.id
 
   node_pool {
     name       = "application-pool"
@@ -51,7 +55,7 @@ resource "digitalocean_loadbalancer" "public" {
   name        = format("%s-%s-%s", var.project_name, var.cluster_name, "load-balancer")
   region      = var.provider_region
   droplet_tag = var.project_name
-  vpc_uuid    = digitalocean_vpc.default.id
+  vpc_uuid    = digitalocean_vpc.get.id
 
   forwarding_rule {
     entry_port      = 80
